@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "eamodio.gitlens",
+        "matklad.rust-analyzer",
+        "vadimcn.vscode-lldb",
+        "bungcip.better-toml"
+    ]
+}
