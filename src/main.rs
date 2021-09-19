@@ -30,6 +30,7 @@ fn main() {
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(RapierRenderPlugin)
         // Internal plugins
+        .add_state(GameState::Loading)
         .add_plugin(level_1::Plugin)
         .add_plugin(camera::Plugin)
         .run();
