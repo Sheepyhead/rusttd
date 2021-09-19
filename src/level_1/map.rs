@@ -10,7 +10,7 @@ pub fn build(
     commands
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Plane { size: 100.0 }.into()),
-            material: mats.add(Color::GRAY.into()),
+            material: mats.add(Color::DARK_GREEN.into()),
             ..PbrBundle::default()
         })
         .insert_bundle((Ground,));
