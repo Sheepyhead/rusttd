@@ -1,3 +1,11 @@
+#![warn(clippy::pedantic)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::must_use_candidate)]
+#![allow(clippy::needless_pass_by_value)]
+#![allow(clippy::enum_glob_use)]
+
 use bevy::prelude::*;
 use bevy_asset_loader::AssetLoader;
 use bevy_inspector_egui::InspectableRegistry;
@@ -10,6 +18,7 @@ use kurinji::KurinjiPlugin;
 use level_1::assets::{self, GameState};
 
 mod camera;
+mod grid;
 pub mod level_1;
 
 fn main() {
@@ -33,5 +42,6 @@ fn main() {
         .add_state(GameState::Loading)
         .add_plugin(level_1::Plugin)
         .add_plugin(camera::Plugin)
+        .add_plugin(grid::Plugin)
         .run();
 }

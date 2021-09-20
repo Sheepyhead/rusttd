@@ -1,8 +1,40 @@
+use crate::grid::Grid;
 use bevy::prelude::{shape::Plane, *};
+
+const BLOCKED_SLOTS: [(i32, i32); 28] = [
+    (0, 1),
+    (1, 1),
+    (1, 2),
+    (1, 12),
+    (1, 13),
+    (1, 14),
+    (2, 1),
+    (2, 13),
+    (8, 1),
+    (9, 1),
+    (9, 2),
+    (9, 20),
+    (9, 21),
+    (9, 22),
+    (10, 1),
+    (10, 21),
+    (16, 1),
+    (16, 13),
+    (17, 0),
+    (17, 1),
+    (17, 2),
+    (17, 12),
+    (17, 13),
+    (18, 13),
+    (28, 21),
+    (29, 21),
+    (29, 22),
+    (30, 21),
+];
 
 pub struct Ground;
 
-pub fn build(
+pub fn build_ground(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut mats: ResMut<Assets<StandardMaterial>>,
@@ -14,4 +46,21 @@ pub fn build(
             ..PbrBundle::default()
         })
         .insert_bundle((Ground,));
+}
+
+/// # Panics
+///
+/// Will panic if grid fails to block properly, usually caused by the `Grid::clear` failing
+pub fn build_grid(mut grid: ResMut<Grid>) {
+    grid.clear();
+    for (x, y) in BLOCKED_SLOTS {
+        let x = x * 2;
+        let y = y * 2;
+        for x in x..=x + 1 {
+            for y in y..=y + 1 {
+                grid.block((x, y))
+                    .unwrap_or_else(|_| panic!("Failed to block grid slot {};{}", x, y));
+            }
+        }
+    }
 }
