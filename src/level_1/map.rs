@@ -1,5 +1,6 @@
-use crate::grid::Grid;
+use crate::{grid::Grid, maps::Ground};
 use bevy::prelude::{shape::Plane, *};
+use bevy_mod_picking::PickableBundle;
 
 const BLOCKED_SLOTS: [(i32, i32); 28] = [
     (0, 1),
@@ -32,8 +33,6 @@ const BLOCKED_SLOTS: [(i32, i32); 28] = [
     (30, 21),
 ];
 
-pub struct Ground;
-
 pub fn build_ground(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -42,9 +41,11 @@ pub fn build_ground(
     commands
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Plane { size: 100.0 }.into()),
-            material: mats.add(Color::DARK_GREEN.into()),
+            material: mats.add(Color::GREEN.into()),
+            transform: Transform::from_translation(Vec3::new(0.0, -0.1, 0.0)),
             ..PbrBundle::default()
         })
+        .insert_bundle(PickableBundle::default())
         .insert_bundle((Ground,));
 }
 

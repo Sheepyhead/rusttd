@@ -18,8 +18,10 @@ use kurinji::KurinjiPlugin;
 use level_1::assets::{self, GameState};
 
 mod camera;
+pub mod cursor;
 mod grid;
 pub mod level_1;
+pub mod maps;
 
 fn main() {
     let mut app = App::build();
@@ -43,5 +45,6 @@ fn main() {
         .add_plugin(level_1::Plugin)
         .add_plugin(camera::Plugin)
         .add_plugin(grid::Plugin)
+        .add_plugin(cursor::Plugin)
         .run();
 }

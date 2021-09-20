@@ -1,0 +1,91 @@
+use crate::{grid, level_1::assets::GameState, maps::Ground};
+use bevy::prelude::{self, shape::Plane, *};
+use bevy_mod_picking::PickingCamera;
+
+pub struct Plugin;
+
+impl prelude::Plugin for Plugin {
+    fn build(&self, app: &mut prelude::AppBuilder) {
+        app.insert_resource(ShowGrid(true)).add_system_set(
+            SystemSet::on_update(GameState::Play).with_system(render_grid.system()),
+        );
+    }
+}
+
+#[derive(Default)]
+pub struct ShowGrid(bool);
+
+pub struct Grid;
+
+fn render_grid(
+    mut commands: Commands,
+    show: Res<ShowGrid>,
+    grid: Res<grid::Grid>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut cursors: Query<(Entity, &mut Transform, &mut Handle<StandardMaterial>), With<Grid>>,
+    cameras: Query<&PickingCamera>,
+    ground: Query<(), With<Ground>>,
+) {
+    if show.0 {
+        let camera = cameras
+            .single()
+            .expect("Missing or multiple picking cameras");
+
+        let (picked_entity, intersection) = if let Some(val) = camera.intersect_top() {
+            val
+        } else {
+            despawn_cursor(&mut cursors, &mut commands);
+            return;
+        };
+
+        if ground.get(picked_entity).is_err() {
+            despawn_cursor(&mut cursors, &mut commands);
+            return;
+        }
+
+        let grid_pos = grid::Grid::snap_to_grid(intersection.position());
+
+        let material = materials.add(
+            if grid.buildable(&[
+                grid::Grid::to_grid_pos(grid_pos),
+                grid::Grid::to_grid_pos(Vec3::new(grid_pos.x + 1.0, grid_pos.y, grid_pos.z)),
+                grid::Grid::to_grid_pos(Vec3::new(grid_pos.x, grid_pos.y, grid_pos.z + 1.0)),
+                grid::Grid::to_grid_pos(Vec3::new(grid_pos.x + 1.0, grid_pos.y, grid_pos.z + 1.0)),
+            ]) {
+                Color::BLUE.into()
+            } else {
+                Color::RED.into()
+            },
+        );
+
+        if let Ok((_, mut transform, mut mat)) = cursors.single_mut() {
+            if transform.translation != grid_pos {
+                transform.translation = grid_pos;
+            }
+            if *mat != material {
+                *mat = material;
+            }
+        } else {
+            commands
+                .spawn_bundle(PbrBundle {
+                    mesh: meshes.add(Plane { size: 2.0 }.into()),
+                    transform: Transform::from_translation(grid_pos),
+                    material,
+                    ..PbrBundle::default()
+                })
+                .insert(Grid);
+        }
+    } else {
+        despawn_cursor(&mut cursors, &mut commands);
+    }
+}
+
+fn despawn_cursor(
+    cursors: &mut Query<(Entity, &mut Transform, &mut Handle<StandardMaterial>), With<Grid>>,
+    commands: &mut Commands,
+) {
+    for (entity, _, _) in cursors.iter_mut() {
+        commands.entity(entity).despawn_recursive();
+    }
+}

@@ -21,13 +21,20 @@ pub enum Slot {
 pub struct Grid(HashMap<(i32, i32), Slot>);
 
 impl Grid {
-    pub fn buildable(&self, pos: (i32, i32)) -> bool {
-        !self.0.contains_key(&pos)
+    pub fn buildable(&self, pos: &[(i32, i32)]) -> bool {
+        for pos in pos {
+            if self.0.contains_key(pos) {
+                return false;
+            }
+        }
+        true
     }
 
-    pub fn add_building(&mut self, pos: (i32, i32), entity: Entity) -> Result<(), ()> {
-        if self.buildable(pos) {
-            self.0.insert(pos, Slot::Occupied(entity));
+    pub fn add_building(&mut self, pos: Vec<(i32, i32)>, entity: Entity) -> Result<(), ()> {
+        if self.buildable(&pos) {
+            for pos in pos {
+                self.0.insert(pos, Slot::Occupied(entity));
+            }
             Ok(())
         } else {
             Err(())
@@ -35,7 +42,7 @@ impl Grid {
     }
 
     pub fn snap_to_grid(pos: Vec3) -> Vec3 {
-        Vec3::new(pos.x.floor(), 0.0, pos.z.floor())
+        Vec3::new(pos.x.round(), 0.0, pos.z.round())
     }
 
     #[allow(clippy::cast_possible_truncation)]
@@ -49,7 +56,7 @@ impl Grid {
     }
 
     pub fn block(&mut self, pos: (i32, i32)) -> Result<(), ()> {
-        if self.buildable(pos) {
+        if self.buildable(&[pos]) {
             self.0.insert(pos, Slot::Blocked);
             Ok(())
         } else {
