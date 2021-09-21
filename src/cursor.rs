@@ -1,13 +1,16 @@
-use crate::{grid, level_1::assets::GameState, maps::Ground};
+use crate::{grid, level_1::assets::GameState, maps::Ground, towers::BuildGem};
 use bevy::prelude::{self, shape::Plane, *};
 use bevy_mod_picking::PickingCamera;
+use kurinji::OnActionBegin;
 
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
         app.insert_resource(ShowGrid(true)).add_system_set(
-            SystemSet::on_update(GameState::Play).with_system(render_grid.system()),
+            SystemSet::on_update(GameState::Play)
+                .with_system(render_grid.system())
+                .with_system(on_click.system()),
         );
     }
 }
@@ -87,5 +90,36 @@ fn despawn_cursor(
 ) {
     for (entity, _, _) in cursors.iter_mut() {
         commands.entity(entity).despawn_recursive();
+    }
+}
+
+fn on_click(
+    mut er: EventReader<OnActionBegin>,
+    mut ew: EventWriter<BuildGem>,
+    cameras: Query<&PickingCamera>,
+    ground: Query<(), With<Ground>>,
+) {
+    for action in er.iter() {
+        if action.action != "LEFT_CLICK" {
+            continue;
+        }
+
+        let camera = cameras
+            .single()
+            .expect("Missing or multiple picking cameras");
+
+        let (picked_entity, intersection) = if let Some(val) = camera.intersect_top() {
+            val
+        } else {
+            continue;
+        };
+
+        if ground.get(picked_entity).is_err() {
+            continue;
+        }
+
+        let grid_pos = grid::Grid::to_grid_pos(intersection.position());
+
+        ew.send(BuildGem { pos: grid_pos });
     }
 }

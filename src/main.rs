@@ -23,6 +23,7 @@ mod grid;
 mod input;
 pub mod level_1;
 pub mod maps;
+pub mod towers;
 
 fn main() {
     let mut app = App::build();
@@ -48,5 +49,6 @@ fn main() {
         .add_plugin(grid::Plugin)
         .add_plugin(cursor::Plugin)
         .add_plugin(input::Plugin)
+        .add_plugin(towers::Plugin)
         .run();
 }

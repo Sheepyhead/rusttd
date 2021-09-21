@@ -30,10 +30,10 @@ impl Grid {
         true
     }
 
-    pub fn add_building(&mut self, pos: Vec<(i32, i32)>, entity: Entity) -> Result<(), ()> {
-        if self.buildable(&pos) {
+    pub fn add_building(&mut self, pos: &[(i32, i32)], entity: Entity) -> Result<(), ()> {
+        if self.buildable(pos) {
             for pos in pos {
-                self.0.insert(pos, Slot::Occupied(entity));
+                self.0.insert(*pos, Slot::Occupied(entity));
             }
             Ok(())
         } else {

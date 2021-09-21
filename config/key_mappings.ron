@@ -1,4 +1,7 @@
 (
+    MouseButtons: {
+        Left: "LEFT_CLICK"
+    },
     KeyboardKeys: {
         E: "CAMERA_RIGHT",
         A: "CAMERA_LEFT",
