@@ -33,8 +33,10 @@ const BLOCKED_SLOTS: [(i32, i32); 28] = [
     (30, 21),
 ];
 
+#[allow(clippy::cast_precision_loss)]
 pub fn build_ground(
     mut commands: Commands,
+    grid: Res<Grid>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut mats: ResMut<Assets<StandardMaterial>>,
 ) {
@@ -47,6 +49,16 @@ pub fn build_ground(
         })
         .insert_bundle(PickableBundle::default())
         .insert_bundle((Ground,));
+
+    for (x, y) in grid.keys() {
+        let new_pos = Vec3::new((*x as f32) - 0.5, -0.05, (*y as f32) - 0.5);
+        commands.spawn_bundle(PbrBundle {
+            mesh: meshes.add(Plane { size: 1.0 }.into()),
+            material: mats.add(Color::WHITE.into()),
+            transform: Transform::from_translation(new_pos),
+            ..PbrBundle::default()
+        });
+    }
 }
 
 /// # Panics

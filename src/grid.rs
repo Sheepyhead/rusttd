@@ -63,4 +63,8 @@ impl Grid {
             Err(())
         }
     }
+
+    pub fn keys(&self) -> std::collections::hash_map::Keys<(i32, i32), Slot> {
+        self.0.keys()
+    }
 }
