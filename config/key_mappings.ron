@@ -1,0 +1,10 @@
+(
+    KeyboardKeys: {
+        E: "CAMERA_RIGHT",
+        A: "CAMERA_LEFT",
+        Equals: "CAMERA_DOWN",
+        Minus: "CAMERA_UP",
+        O: "CAMERA_FORWARD",
+        Comma: "CAMERA_BACK"
+    }
+)

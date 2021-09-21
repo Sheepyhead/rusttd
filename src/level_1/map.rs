@@ -44,7 +44,7 @@ pub fn build_ground(
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Plane { size: 100.0 }.into()),
             material: mats.add(Color::GREEN.into()),
-            transform: Transform::from_translation(Vec3::new(0.0, -0.1, 0.0)),
+            transform: Transform::from_translation(Vec3::new(25.0, -0.1, 20.0)),
             ..PbrBundle::default()
         })
         .insert_bundle(PickableBundle::default())

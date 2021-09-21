@@ -20,6 +20,7 @@ use level_1::assets::{self, GameState};
 mod camera;
 pub mod cursor;
 mod grid;
+mod input;
 pub mod level_1;
 pub mod maps;
 
@@ -46,5 +47,6 @@ fn main() {
         .add_plugin(camera::Plugin)
         .add_plugin(grid::Plugin)
         .add_plugin(cursor::Plugin)
+        .add_plugin(input::Plugin)
         .run();
 }
