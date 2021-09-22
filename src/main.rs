@@ -6,7 +6,7 @@
 #![allow(clippy::needless_pass_by_value)]
 #![allow(clippy::enum_glob_use)]
 
-use bevy::prelude::*;
+use bevy::{pbr::AmbientLight, prelude::*};
 use bevy_asset_loader::AssetLoader;
 use bevy_inspector_egui::InspectableRegistry;
 use bevy_mod_picking::{InteractablePickingPlugin, PickingPlugin};
@@ -35,6 +35,10 @@ fn main() {
     app.insert_resource(Msaa { samples: 4 })
         .insert_resource(InspectableRegistry::default())
         .insert_resource(ClearColor(Color::BLACK))
+        .insert_resource(AmbientLight {
+            color: Color::WHITE,
+            brightness: 1.0,
+        })
         // External plugins
         .add_plugins(DefaultPlugins)
         .add_plugin(PickingPlugin)

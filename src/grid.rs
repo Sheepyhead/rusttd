@@ -67,4 +67,11 @@ impl Grid {
     pub fn keys(&self) -> std::collections::hash_map::Keys<(i32, i32), Slot> {
         self.0.keys()
     }
+
+    pub fn get(&self, pos: (i32, i32)) -> Option<Entity> {
+        match self.0.get(&pos)? {
+            Slot::Occupied(entity) => Some(*entity),
+            Slot::Blocked => None,
+        }
+    }
 }

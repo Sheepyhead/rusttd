@@ -1,4 +1,9 @@
-use crate::{grid, level_1::LevelState, maps::Ground, towers::BuildGem};
+use crate::{
+    grid,
+    level_1::LevelState,
+    maps::Ground,
+    towers::{BuildGem, ChooseGem},
+};
 use bevy::prelude::{self, shape::Plane, *};
 use bevy_mod_picking::PickingCamera;
 use kurinji::OnActionBegin;
@@ -7,11 +12,15 @@ pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
-        app.insert_resource(ShowGrid(true)).add_system_set(
-            SystemSet::on_update(LevelState::Building)
-                .with_system(render_grid.system())
-                .with_system(on_click.system()),
-        );
+        app.insert_resource(ShowGrid(true))
+            .add_system_set(
+                SystemSet::on_update(LevelState::Building)
+                    .with_system(render_grid.system())
+                    .with_system(build_on_click.system()),
+            )
+            .add_system_set(
+                SystemSet::on_update(LevelState::Choosing).with_system(choose_on_click.system()),
+            );
     }
 }
 
@@ -93,7 +102,7 @@ fn despawn_cursor(
     }
 }
 
-fn on_click(
+fn build_on_click(
     mut er: EventReader<OnActionBegin>,
     mut ew: EventWriter<BuildGem>,
     cameras: Query<&PickingCamera>,
@@ -121,5 +130,35 @@ fn on_click(
         let grid_pos = grid::Grid::to_grid_pos(intersection.position());
 
         ew.send(BuildGem { pos: grid_pos });
+    }
+}
+
+fn choose_on_click(
+    mut er: EventReader<OnActionBegin>,
+    mut ew: EventWriter<ChooseGem>,
+    cameras: Query<&PickingCamera>,
+    ground: Query<(), With<Ground>>,
+) {
+    for action in er.iter() {
+        if action.action != "LEFT_CLICK" {
+            continue;
+        }
+        let camera = cameras
+            .single()
+            .expect("Missing or multiple picking cameras");
+
+        let (picked_entity, intersection) = if let Some(val) = camera.intersect_top() {
+            val
+        } else {
+            continue;
+        };
+
+        if ground.get(picked_entity).is_err() {
+            continue;
+        }
+
+        let grid_pos = grid::Grid::to_grid_pos(intersection.position());
+
+        ew.send(ChooseGem { pos: grid_pos });
     }
 }

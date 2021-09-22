@@ -1,5 +1,5 @@
 use self::assets::GameState;
-use crate::towers::Gem;
+use crate::towers::{Gem, JustBuilt};
 use bevy::prelude::{self, *};
 
 pub mod assets;
@@ -17,6 +17,9 @@ impl prelude::Plugin for Plugin {
             )
             .add_system_set(
                 SystemSet::on_update(LevelState::Building).with_system(build_five.system()),
+            )
+            .add_system_set(
+                SystemSet::on_update(LevelState::Choosing).with_system(choose_one.system()),
             );
     }
 }
@@ -38,10 +41,19 @@ fn build_five(
     }
 
     if *gem_count >= 5 {
-        match level_state.set(LevelState::Choosing) {
-            Ok(_) => {}
-            Err(_) => todo!(),
-        };
+        level_state
+            .set(LevelState::Choosing)
+            .map_err(|err| error!("Failed to set level state to Choosing: {}", err))
+            .ok();
         *gem_count = 0;
+    }
+}
+
+fn choose_one(mut level_state: ResMut<State<LevelState>>, gems: Query<(), With<JustBuilt>>) {
+    if gems.iter().count() == 0 {
+        level_state
+            .set(LevelState::Spawning)
+            .map_err(|err| error!("Failed to set level state to Spawning: {}", err))
+            .ok();
     }
 }
