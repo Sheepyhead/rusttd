@@ -1,4 +1,4 @@
-use crate::{grid, level_1::assets::GameState, maps::Ground, towers::BuildGem};
+use crate::{grid, level_1::LevelState, maps::Ground, towers::BuildGem};
 use bevy::prelude::{self, shape::Plane, *};
 use bevy_mod_picking::PickingCamera;
 use kurinji::OnActionBegin;
@@ -8,7 +8,7 @@ pub struct Plugin;
 impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
         app.insert_resource(ShowGrid(true)).add_system_set(
-            SystemSet::on_update(GameState::Play)
+            SystemSet::on_update(LevelState::Building)
                 .with_system(render_grid.system())
                 .with_system(on_click.system()),
         );

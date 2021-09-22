@@ -1,12 +1,13 @@
-use crate::{grid::Grid, level_1::assets::GameState};
+use crate::{grid::Grid, level_1::LevelState};
 use bevy::prelude::{self, *};
 
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
-        app.add_event::<BuildGem>()
-            .add_system_set(SystemSet::on_update(GameState::Play).with_system(build_gem.system()));
+        app.add_event::<BuildGem>().add_system_set(
+            SystemSet::on_update(LevelState::Building).with_system(build_gem.system()),
+        );
     }
 }
 

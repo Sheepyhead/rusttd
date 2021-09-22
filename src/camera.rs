@@ -8,7 +8,7 @@ pub struct Plugin;
 
 impl bevy::prelude::Plugin for Plugin {
     fn build(&self, app: &mut bevy::prelude::AppBuilder) {
-        app.add_system_set(SystemSet::on_enter(GameState::Play).with_system(setup.system()))
+        app.add_startup_system(setup.system())
             .add_system_set(SystemSet::on_update(GameState::Play).with_system(control.system()));
     }
 }
