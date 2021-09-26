@@ -1,18 +1,23 @@
 use crate::{grid::Grid, level_1::LevelState};
 use bevy::prelude::{self, *};
 
+mod diamond;
+
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
-        app.add_event::<BuildGem>()
+        app.add_plugin(diamond::Plugin)
+            .add_event::<BuildGem>()
             .add_event::<ChooseGem>()
+            .add_event::<ProjectileHit>()
             .add_system_set(
                 SystemSet::on_update(LevelState::Building).with_system(build_gem.system()),
             )
             .add_system_set(
                 SystemSet::on_update(LevelState::Choosing).with_system(choose_gem.system()),
-            );
+            )
+            .add_system(move_projectile.system());
     }
 }
 
@@ -27,6 +32,7 @@ pub enum GemType {
 pub struct Gem {
     pub quality: GemQuality,
     pub r#type: GemType,
+    pub cooldown: Timer,
 }
 
 pub struct JustBuilt;
@@ -64,6 +70,7 @@ fn build_gem(
                 Gem {
                     quality: GemQuality::Chipped,
                     r#type: GemType::Diamond,
+                    cooldown: Timer::from_seconds(1.0, true),
                 },
                 JustBuilt,
             ))
@@ -101,6 +108,39 @@ fn choose_gem(
                     commands.entity(entity).remove::<Gem>().insert(Rock);
                 }
                 commands.entity(entity).remove::<JustBuilt>();
+            }
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct Projectile {
+    origin: Entity,
+    target: Entity,
+}
+
+pub struct ProjectileHit(Projectile);
+
+fn move_projectile(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut ew: EventWriter<ProjectileHit>,
+    mut projectile: Query<(Entity, &mut Transform, &Projectile)>,
+    positions: Query<&GlobalTransform>,
+) {
+    for (proj_entity, mut transform, projectile) in projectile.iter_mut() {
+        let target = positions.get(projectile.target);
+        if let Ok(target) = target {
+            let mut direction = target.translation - transform.translation;
+            direction = direction.normalize();
+            direction *= 10.0 * time.delta_seconds();
+            transform.translation += direction;
+
+            if (target.translation.x - transform.translation.x).abs() <= 0.05
+                && (target.translation.z - transform.translation.z).abs() <= 0.05
+            {
+                ew.send(ProjectileHit(*projectile));
+                commands.entity(proj_entity).despawn_recursive();
             }
         }
     }

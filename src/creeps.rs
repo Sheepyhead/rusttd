@@ -99,7 +99,7 @@ fn moving(
                 destination.1 as f32,
             ) - transform.translation;
             direction = direction.normalize();
-            direction *= 10.0 * time.delta_seconds();
+            direction *= 5.0 * time.delta_seconds();
             transform.translation += direction;
 
             if (transform.translation.x - destination.0 as f32).abs() <= 0.05
