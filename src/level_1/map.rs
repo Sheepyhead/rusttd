@@ -33,6 +33,17 @@ const BLOCKED_SLOTS: [(i32, i32); 28] = [
     (30, 21),
 ];
 
+pub const CREEP_ROUTE: [(i32, i32); 8] = [
+    (2, 2),
+    (2, 26),
+    (34, 26),
+    (34, 2),
+    (18, 2),
+    (18, 42),
+    (58, 42),
+    (58, 80),
+];
+
 #[allow(clippy::cast_precision_loss)]
 pub fn build_ground(
     mut commands: Commands,
