@@ -24,6 +24,7 @@ mod input;
 pub mod level_1;
 pub mod maps;
 pub mod towers;
+pub mod workarounds;
 
 fn main() {
     let mut app = App::build();

@@ -1,5 +1,8 @@
 use self::assets::GameState;
-use crate::towers::{Gem, JustBuilt};
+use crate::{
+    towers::{Gem, JustBuilt},
+    workarounds::clear_input_events,
+};
 use bevy::prelude::{self, *};
 
 pub mod assets;
@@ -17,6 +20,9 @@ impl prelude::Plugin for Plugin {
             )
             .add_system_set(
                 SystemSet::on_update(LevelState::Building).with_system(build_five.system()),
+            )
+            .add_system_set(
+                SystemSet::on_enter(LevelState::Choosing).with_system(clear_input_events.system()),
             )
             .add_system_set(
                 SystemSet::on_update(LevelState::Choosing).with_system(choose_one.system()),
