@@ -6,14 +6,16 @@ pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
-        app.add_system_set(
-            SystemSet::on_enter(LevelState::Spawning).with_system(start_spawn.system()),
-        )
-        .add_system_set(
-            SystemSet::on_update(LevelState::Spawning)
-                .with_system(spawn.system())
-                .with_system(moving.system()),
-        );
+        app.add_event::<Death>()
+            .add_system_set(
+                SystemSet::on_enter(LevelState::Spawning).with_system(start_spawn.system()),
+            )
+            .add_system_set(
+                SystemSet::on_update(LevelState::Spawning)
+                    .with_system(spawn.system())
+                    .with_system(moving.system())
+                    .with_system(death.system()),
+            );
     }
 }
 
@@ -86,6 +88,7 @@ fn spawn(
 fn moving(
     mut commands: Commands,
     time: Res<Time>,
+    mut ew: EventWriter<Death>,
     mut creeps: Query<(Entity, &mut Transform, &mut Creep)>,
 ) {
     for (creep_entity, mut transform, mut creep) in creeps.iter_mut() {
@@ -110,7 +113,29 @@ fn moving(
                 "Creep {:?} has been leaked with {} life remaining",
                 creep_entity, creep.life
             );
+            ew.send(Death {
+                _remaining_life: Some(creep.life),
+            });
             commands.entity(creep_entity).despawn_recursive();
+        }
+    }
+}
+
+struct Death {
+    _remaining_life: Option<u64>,
+}
+
+fn death(
+    mut level_state: ResMut<State<LevelState>>,
+    mut er: EventReader<Death>,
+    creeps: Query<(), With<Creep>>,
+) {
+    for _ in er.iter() {
+        if creeps.iter().count() == 0 {
+            level_state
+                .set(LevelState::Building)
+                .map_err(|err| error!("Failed to set level state to building: {}", err))
+                .ok();
         }
     }
 }
