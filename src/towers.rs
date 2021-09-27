@@ -74,6 +74,11 @@ fn build_gem(
                 },
                 JustBuilt,
             ))
+            .insert_bundle(TowerBundle {
+                damage: Damage(20),
+                speed: AttackSpeed(80),
+                range: Range(5.0),
+            })
             .id();
         grid.add_building(&positions, entity)
             .map_err(|_| info!("Failed to add building to {};{}", pos.0, pos.1))
@@ -144,4 +149,17 @@ fn move_projectile(
             }
         }
     }
+}
+
+pub struct Damage(u64);
+
+pub struct AttackSpeed(u64);
+
+pub struct Range(f32);
+
+#[derive(Bundle)]
+pub struct TowerBundle {
+    damage: Damage,
+    speed: AttackSpeed,
+    range: Range,
 }
