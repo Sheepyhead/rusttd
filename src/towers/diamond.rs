@@ -1,4 +1,6 @@
-use super::{Gem, Projectile};
+use std::time::Duration;
+
+use super::{AttackSpeed, Gem, Projectile};
 use crate::{creeps::Creep, level_1::LevelState};
 use bevy::prelude::{self, *};
 
@@ -14,10 +16,11 @@ fn attack(
     mut commands: Commands,
     time: Res<Time>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut gems: Query<(Entity, &GlobalTransform, &mut Gem)>,
+    mut gems: Query<(Entity, &GlobalTransform, &mut Gem, &AttackSpeed)>,
     creeps: Query<(Entity, &GlobalTransform), With<Creep>>,
 ) {
-    for (gem_entity, gem_position, mut gem) in gems.iter_mut() {
+    for (gem_entity, gem_position, mut gem, AttackSpeed(speed)) in gems.iter_mut() {
+        gem.cooldown.set_duration(Duration::from_secs_f32(1.0 * speed));
         gem.cooldown.tick(time.delta());
         if !gem.cooldown.just_finished() {
             continue;

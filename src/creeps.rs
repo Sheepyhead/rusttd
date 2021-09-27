@@ -2,7 +2,7 @@ use bevy::prelude::{self, *};
 
 use crate::{
     level_1::{map, LevelState},
-    towers::{Damage, Gem, ProjectileHit},
+    towers::{Damage, ProjectileHit},
 };
 
 pub struct Plugin;

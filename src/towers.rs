@@ -76,7 +76,7 @@ fn build_gem(
             ))
             .insert_bundle(TowerBundle {
                 damage: Damage(20),
-                speed: AttackSpeed(80),
+                speed: AttackSpeed(0.8),
                 range: Range(5.0),
             })
             .id();
@@ -153,7 +153,7 @@ fn move_projectile(
 
 pub struct Damage(pub u64);
 
-pub struct AttackSpeed(pub u64);
+pub struct AttackSpeed(pub f32);
 
 pub struct Range(pub f32);
 
