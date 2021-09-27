@@ -2,7 +2,7 @@ use bevy::prelude::{self, *};
 
 use crate::{
     level_1::{map, LevelState},
-    towers::{Gem, ProjectileHit},
+    towers::{Damage, Gem, ProjectileHit},
 };
 
 pub struct Plugin;
@@ -148,20 +148,24 @@ fn projectile_hit(
     mut commands: Commands,
     mut er: EventReader<ProjectileHit>,
     mut ew: EventWriter<Death>,
+    towers: Query<&Damage>,
     mut creeps: Query<&mut Creep>,
 ) {
     for ProjectileHit(projectile) in er.iter() {
         if let Ok(mut creep) = creeps.get_mut(projectile.target) {
-            let damage = 20;
-            if creep.life >= damage {
-                creep.life -= damage;
-            }
+            if let Ok(Damage(damage)) = towers.get(projectile.origin) {
+                if creep.life >= *damage {
+                    creep.life -= *damage;
+                    info!("Creep {:?} took {} damage", projectile.target, *damage);
+                }
 
-            if creep.life == 0 {
-                ew.send(Death {
-                    _remaining_life: None,
-                });
-                commands.entity(projectile.target).despawn_recursive();
+                if creep.life == 0 {
+                    ew.send(Death {
+                        _remaining_life: None,
+                    });
+                    commands.entity(projectile.target).despawn_recursive();
+                    info!("Creep {:?} has died", projectile.target);
+                }
             }
         }
     }

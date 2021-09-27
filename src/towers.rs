@@ -151,11 +151,11 @@ fn move_projectile(
     }
 }
 
-pub struct Damage(u64);
+pub struct Damage(pub u64);
 
-pub struct AttackSpeed(u64);
+pub struct AttackSpeed(pub u64);
 
-pub struct Range(f32);
+pub struct Range(pub f32);
 
 #[derive(Bundle)]
 pub struct TowerBundle {
