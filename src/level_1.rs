@@ -1,8 +1,5 @@
 use self::assets::GameState;
-use crate::{
-    towers::{Gem, JustBuilt},
-    workarounds::clear_input_events,
-};
+use crate::{towers::JustBuilt, workarounds::clear_input_events};
 use bevy::prelude::{self, *};
 
 pub mod assets;
@@ -40,7 +37,7 @@ pub enum LevelState {
 fn build_five(
     mut level_state: ResMut<State<LevelState>>,
     mut gem_count: Local<u32>,
-    gems: Query<(), Added<Gem>>,
+    gems: Query<(), Added<JustBuilt>>,
 ) {
     for _ in gems.iter() {
         *gem_count += 1;

@@ -40,7 +40,7 @@ fn main() {
         .insert_resource(ClearColor(Color::BLACK))
         .insert_resource(AmbientLight {
             color: Color::WHITE,
-            brightness: 1.0,
+            brightness: 0.2,
         })
         // External plugins
         .add_plugins(DefaultPlugins)

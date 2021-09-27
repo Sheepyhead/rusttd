@@ -10,10 +10,12 @@ bevy = "0.5.0"
 kurinji = { git = "https://github.com/jacobjenks/kurinji", branch = "upgrade_bevy_0.5"}
 bevy_rapier3d = "0.10.2"
 bevy_mod_picking = "0.4"
-rand = "0.8.0"
+rand = "0.8.4"
 bevy-inspector-egui = "0.5.1"
 bevy_asset_loader = "0.5.0"
 pathfinding = "2.2.1"
+strum = "0.21"
+strum_macros = "0.21"
 
 # Optimization
 [profile.dev.package."*"]

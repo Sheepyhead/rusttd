@@ -8,6 +8,12 @@
         Equals: "CAMERA_DOWN",
         Minus: "CAMERA_UP",
         O: "CAMERA_FORWARD",
-        Comma: "CAMERA_BACK"
+        Comma: "CAMERA_BACK",
+        D: "CAMERA_RIGHT",
+        A: "CAMERA_LEFT",
+        R: "CAMERA_DOWN",
+        F: "CAMERA_UP",
+        S: "CAMERA_FORWARD",
+        W: "CAMERA_BACK"
     }
 )
