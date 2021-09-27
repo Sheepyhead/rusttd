@@ -35,7 +35,7 @@ fn attack(
                 closest_distance = distance;
             }
         }
-        if closest_distance >= 10.0 {
+        if closest_distance >= 15.0 {
             continue;
         }
         if let Some(closest_creep) = closest {
