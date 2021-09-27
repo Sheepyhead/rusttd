@@ -48,6 +48,7 @@ fn build_gem(
     mut er: EventReader<BuildGem>,
     mut grid: ResMut<Grid>,
     mut meshes: ResMut<Assets<Mesh>>,
+    mut mats: ResMut<Assets<StandardMaterial>>,
 ) {
     for BuildGem { pos } in er.iter() {
         let positions = [
@@ -64,22 +65,11 @@ fn build_gem(
         let entity = commands
             .spawn_bundle(PbrBundle {
                 mesh: meshes.add(shape::Cube::new(2.0).into()),
+                material: mats.add(Color::BEIGE.into()),
                 transform: Transform::from_translation(Vec3::new(pos.0 as f32, 0.5, pos.1 as f32)),
                 ..PbrBundle::default()
             })
-            .insert_bundle((
-                Gem {
-                    quality: GemQuality::Chipped,
-                    r#type: GemType::Diamond,
-                },
-                JustBuilt,
-            ))
-            .insert_bundle(TowerBundle {
-                damage: Damage(20),
-                speed: AttackSpeed(0.8),
-                range: Range(20.0),
-                cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            })
+            .insert(JustBuilt)
             .id();
         grid.add_building(&positions, entity)
             .map_err(|_| info!("Failed to add building to {};{}", pos.0, pos.1))
@@ -98,7 +88,7 @@ fn choose_gem(
     mut er: EventReader<ChooseGem>,
     grid: ResMut<Grid>,
     mut mats: ResMut<Assets<StandardMaterial>>,
-    mut gems: Query<(Entity, &mut Handle<StandardMaterial>), (With<Gem>, With<JustBuilt>)>,
+    mut gems: Query<(Entity, &mut Handle<StandardMaterial>), With<JustBuilt>>,
 ) {
     for ChooseGem { pos } in er.iter() {
         if let Some(chosen_entity) = grid.get(*pos) {
@@ -109,6 +99,18 @@ fn choose_gem(
             for (entity, mut material) in gems.iter_mut() {
                 if entity == chosen_entity {
                     *material = mats.add(Color::WHITE.into());
+                    commands
+                        .entity(entity)
+                        .insert_bundle((Gem {
+                            quality: GemQuality::Chipped,
+                            r#type: GemType::Diamond,
+                        },))
+                        .insert_bundle(TowerBundle {
+                            damage: Damage(20),
+                            speed: AttackSpeed(0.8),
+                            range: Range(20.0),
+                            cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+                        });
                 } else {
                     *material = mats.add(Color::DARK_GRAY.into());
                     commands.entity(entity).remove::<Gem>().insert(Rock);
