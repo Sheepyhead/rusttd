@@ -115,11 +115,11 @@ fn choose_gem(
 
 #[derive(Clone, Copy)]
 pub struct Projectile {
-    origin: Entity,
-    target: Entity,
+    pub origin: Entity,
+    pub target: Entity,
 }
 
-pub struct ProjectileHit(Projectile);
+pub struct ProjectileHit(pub Projectile);
 
 fn move_projectile(
     mut commands: Commands,

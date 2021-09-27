@@ -1,6 +1,9 @@
 use bevy::prelude::{self, *};
 
-use crate::level_1::{map, LevelState};
+use crate::{
+    level_1::{map, LevelState},
+    towers::{Gem, ProjectileHit},
+};
 
 pub struct Plugin;
 
@@ -14,7 +17,8 @@ impl prelude::Plugin for Plugin {
                 SystemSet::on_update(LevelState::Spawning)
                     .with_system(spawn.system())
                     .with_system(moving.system())
-                    .with_system(death.system()),
+                    .with_system(death.system())
+                    .with_system(projectile_hit.system()),
             );
     }
 }
@@ -136,6 +140,29 @@ fn death(
                 .set(LevelState::Building)
                 .map_err(|err| error!("Failed to set level state to building: {}", err))
                 .ok();
+        }
+    }
+}
+
+fn projectile_hit(
+    mut commands: Commands,
+    mut er: EventReader<ProjectileHit>,
+    mut ew: EventWriter<Death>,
+    mut creeps: Query<&mut Creep>,
+) {
+    for ProjectileHit(projectile) in er.iter() {
+        if let Ok(mut creep) = creeps.get_mut(projectile.target) {
+            let damage = 20;
+            if creep.life >= damage {
+                creep.life -= damage;
+            }
+
+            if creep.life == 0 {
+                ew.send(Death {
+                    _remaining_life: None,
+                });
+                commands.entity(projectile.target).despawn_recursive();
+            }
         }
     }
 }
