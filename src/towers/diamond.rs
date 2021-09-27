@@ -1,6 +1,7 @@
-use std::time::Duration;
-
-use super::{AttackSpeed, Gem, Projectile, Range};
+use super::{
+    ccoldown_is_done, get_closest_creep_within_range, launch_projectile, AttackSpeed, Cooldown,
+    Gem, GemType, Range,
+};
 use crate::{creeps::Creep, level_1::LevelState};
 use bevy::prelude::{self, *};
 
@@ -16,49 +17,35 @@ fn attack(
     mut commands: Commands,
     time: Res<Time>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut gems: Query<(Entity, &GlobalTransform, &mut Gem, &AttackSpeed, &Range)>,
+    mut gems: Query<(
+        Entity,
+        &GlobalTransform,
+        &Gem,
+        &AttackSpeed,
+        &Range,
+        &mut Cooldown,
+    )>,
     creeps: Query<(Entity, &GlobalTransform), With<Creep>>,
 ) {
-    for (gem_entity, gem_position, mut gem, AttackSpeed(speed), Range(range)) in gems.iter_mut() {
-        gem.cooldown
-            .set_duration(Duration::from_secs_f32(1.0 * speed));
-        gem.cooldown.tick(time.delta());
-        if !gem.cooldown.just_finished() {
+    for (gem_entity, gem_position, gem, AttackSpeed(speed), Range(range), mut cooldown) in
+        gems.iter_mut()
+    {
+        if !matches!(gem.r#type, GemType::Diamond) {
             continue;
         }
 
-        let mut closest = None;
-        let mut closest_distance = f32::INFINITY;
-        for (creep, position) in creeps.iter() {
-            let distance = gem_position
-                .translation
-                .distance_squared(position.translation);
-
-            if distance < closest_distance {
-                closest = Some(creep);
-                closest_distance = distance;
-            }
-        }
-        if closest_distance >= range * 2.0 {
+        if !ccoldown_is_done(&mut *cooldown, *speed, &time) {
             continue;
         }
-        if let Some(closest_creep) = closest {
-            commands
-                .spawn_bundle(PbrBundle {
-                    mesh: meshes.add(
-                        shape::Icosphere {
-                            radius: 0.1,
-                            subdivisions: 5,
-                        }
-                        .into(),
-                    ),
-                    transform: Transform::from_translation(gem_position.translation),
-                    ..PbrBundle::default()
-                })
-                .insert(Projectile {
-                    origin: gem_entity,
-                    target: closest_creep,
-                });
+
+        if let Some(closest_creep) = get_closest_creep_within_range(&creeps, gem_position, *range) {
+            launch_projectile(
+                &mut commands,
+                &mut meshes,
+                gem_position,
+                gem_entity,
+                closest_creep,
+            );
         }
     }
 }

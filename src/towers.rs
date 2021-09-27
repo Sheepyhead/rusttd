@@ -1,4 +1,6 @@
-use crate::{grid::Grid, level_1::LevelState};
+use std::time::Duration;
+
+use crate::{creeps::Creep, grid::Grid, level_1::LevelState};
 use bevy::prelude::{self, *};
 
 mod diamond;
@@ -32,7 +34,6 @@ pub enum GemType {
 pub struct Gem {
     pub quality: GemQuality,
     pub r#type: GemType,
-    pub cooldown: Timer,
 }
 
 pub struct JustBuilt;
@@ -70,7 +71,6 @@ fn build_gem(
                 Gem {
                     quality: GemQuality::Chipped,
                     r#type: GemType::Diamond,
-                    cooldown: Timer::from_seconds(1.0, true),
                 },
                 JustBuilt,
             ))
@@ -78,6 +78,7 @@ fn build_gem(
                 damage: Damage(20),
                 speed: AttackSpeed(0.8),
                 range: Range(20.0),
+                cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             })
             .id();
         grid.add_building(&positions, entity)
@@ -157,9 +158,68 @@ pub struct AttackSpeed(pub f32);
 
 pub struct Range(pub f32);
 
+pub struct Cooldown(Timer);
+
 #[derive(Bundle)]
 pub struct TowerBundle {
     damage: Damage,
     speed: AttackSpeed,
     range: Range,
+    cooldown: Cooldown,
+}
+
+fn launch_projectile(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    gem_position: &GlobalTransform,
+    gem_entity: Entity,
+    closest_creep: Entity,
+) {
+    commands
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(
+                shape::Icosphere {
+                    radius: 0.1,
+                    subdivisions: 5,
+                }
+                .into(),
+            ),
+            transform: Transform::from_translation(gem_position.translation),
+            ..PbrBundle::default()
+        })
+        .insert(Projectile {
+            origin: gem_entity,
+            target: closest_creep,
+        });
+}
+
+fn ccoldown_is_done(cooldown: &mut Cooldown, speed: f32, time: &Time) -> bool {
+    cooldown
+        .0
+        .set_duration(Duration::from_secs_f32(1.0 * speed));
+    cooldown.0.tick(time.delta());
+    cooldown.0.just_finished()
+}
+
+fn get_closest_creep_within_range(
+    creeps: &Query<(Entity, &GlobalTransform), With<Creep>>,
+    tower_position: &GlobalTransform,
+    range: f32,
+) -> Option<Entity> {
+    let mut closest = None;
+    let mut closest_distance = f32::INFINITY;
+    for (creep, position) in creeps.iter() {
+        let distance = tower_position
+            .translation
+            .distance_squared(position.translation);
+
+        if distance < closest_distance {
+            closest = Some(creep);
+            closest_distance = distance;
+        }
+    }
+    if closest_distance >= range * 2.0 {
+        return None;
+    }
+    closest
 }
