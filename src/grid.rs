@@ -74,4 +74,13 @@ impl Grid {
             Slot::Blocked => None,
         }
     }
+
+    pub fn neighbours(&self, p: (i32, i32)) -> Vec<(i32, i32)> {
+        return vec![
+            (p.0 + 1, p.1),
+            (p.0 - 1, p.1),
+            (p.0, p.1 + 1),
+            (p.0, p.1 - 1),
+        ];
+    }
 }
