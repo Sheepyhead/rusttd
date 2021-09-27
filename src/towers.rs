@@ -1,7 +1,12 @@
-use std::time::Duration;
-
 use crate::{creeps::Creep, grid::Grid, level_1::LevelState};
 use bevy::prelude::{self, *};
+use rand::{
+    distributions::Standard,
+    prelude::{Distribution, IteratorRandom},
+};
+use std::time::Duration;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
 mod diamond;
 
@@ -17,6 +22,9 @@ impl prelude::Plugin for Plugin {
                 SystemSet::on_update(LevelState::Building).with_system(build_gem.system()),
             )
             .add_system_set(
+                SystemSet::on_enter(LevelState::Choosing).with_system(reveal_gems.system()),
+            )
+            .add_system_set(
                 SystemSet::on_update(LevelState::Choosing).with_system(choose_gem.system()),
             )
             .add_system(move_projectile.system());
@@ -27,8 +35,42 @@ pub enum GemQuality {
     Chipped,
 }
 
+#[derive(EnumIter)]
 pub enum GemType {
     Diamond,
+    Aquamarine,
+}
+
+impl GemType {
+    pub fn color(&self) -> Color {
+        match self {
+            GemType::Diamond => Color::WHITE,
+            GemType::Aquamarine => Color::AQUAMARINE,
+        }
+    }
+
+    pub fn tower(&self) -> TowerBundle {
+        match self {
+            GemType::Diamond => TowerBundle {
+                damage: Damage(20),
+                speed: AttackSpeed(1.2),
+                range: Range(20.0),
+                cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            },
+            GemType::Aquamarine => TowerBundle {
+                damage: Damage(10),
+                speed: AttackSpeed(0.8),
+                range: Range(18.0),
+                cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            },
+        }
+    }
+}
+
+impl Distribution<GemType> for Standard {
+    fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> GemType {
+        GemType::iter().choose(rng).unwrap()
+    }
 }
 
 pub struct Gem {
@@ -81,6 +123,24 @@ pub struct ChooseGem {
     pub pos: (i32, i32),
 }
 
+fn reveal_gems(
+    mut commands: Commands,
+    mut mats: ResMut<Assets<StandardMaterial>>,
+    mut gems: Query<(Entity, &mut Handle<StandardMaterial>), With<JustBuilt>>,
+) {
+    for (entity, mut material) in gems.iter_mut() {
+        let r#type: GemType = rand::random();
+        *material = mats.add(r#type.color().into());
+        commands
+            .entity(entity)
+            .insert_bundle(r#type.tower())
+            .insert_bundle((Gem {
+                quality: GemQuality::Chipped,
+                r#type,
+            },));
+    }
+}
+
 pub struct Rock;
 
 fn choose_gem(
@@ -97,23 +157,13 @@ fn choose_gem(
             }
 
             for (entity, mut material) in gems.iter_mut() {
-                if entity == chosen_entity {
-                    *material = mats.add(Color::WHITE.into());
+                if entity != chosen_entity {
+                    *material = mats.add(Color::DARK_GRAY.into());
                     commands
                         .entity(entity)
-                        .insert_bundle((Gem {
-                            quality: GemQuality::Chipped,
-                            r#type: GemType::Diamond,
-                        },))
-                        .insert_bundle(TowerBundle {
-                            damage: Damage(20),
-                            speed: AttackSpeed(0.8),
-                            range: Range(20.0),
-                            cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-                        });
-                } else {
-                    *material = mats.add(Color::DARK_GRAY.into());
-                    commands.entity(entity).remove::<Gem>().insert(Rock);
+                        .remove::<Gem>()
+                        .remove_bundle::<TowerBundle>()
+                        .insert(Rock);
                 }
                 commands.entity(entity).remove::<JustBuilt>();
             }
