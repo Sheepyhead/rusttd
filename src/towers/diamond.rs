@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use super::{AttackSpeed, Gem, Projectile};
+use super::{AttackSpeed, Gem, Projectile, Range};
 use crate::{creeps::Creep, level_1::LevelState};
 use bevy::prelude::{self, *};
 
@@ -16,11 +16,12 @@ fn attack(
     mut commands: Commands,
     time: Res<Time>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut gems: Query<(Entity, &GlobalTransform, &mut Gem, &AttackSpeed)>,
+    mut gems: Query<(Entity, &GlobalTransform, &mut Gem, &AttackSpeed, &Range)>,
     creeps: Query<(Entity, &GlobalTransform), With<Creep>>,
 ) {
-    for (gem_entity, gem_position, mut gem, AttackSpeed(speed)) in gems.iter_mut() {
-        gem.cooldown.set_duration(Duration::from_secs_f32(1.0 * speed));
+    for (gem_entity, gem_position, mut gem, AttackSpeed(speed), Range(range)) in gems.iter_mut() {
+        gem.cooldown
+            .set_duration(Duration::from_secs_f32(1.0 * speed));
         gem.cooldown.tick(time.delta());
         if !gem.cooldown.just_finished() {
             continue;
@@ -38,7 +39,7 @@ fn attack(
                 closest_distance = distance;
             }
         }
-        if closest_distance >= 15.0 {
+        if closest_distance >= range * 2.0 {
             continue;
         }
         if let Some(closest_creep) = closest {

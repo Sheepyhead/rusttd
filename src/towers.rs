@@ -77,7 +77,7 @@ fn build_gem(
             .insert_bundle(TowerBundle {
                 damage: Damage(20),
                 speed: AttackSpeed(0.8),
-                range: Range(5.0),
+                range: Range(20.0),
             })
             .id();
         grid.add_building(&positions, entity)
