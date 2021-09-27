@@ -1,22 +1,5 @@
-use pathfinding::prelude::bfs;
-
 use crate::grid::Grid;
-
-#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct Pos(i32, i32);
-
-impl Pos {
-    fn successors(&self) -> Vec<Pos> {
-        let &Pos(x, y) = self;
-        vec![Pos(x + 1, y), Pos(x - 1, y), Pos(x, y + 1), Pos(x, y - 1)]
-    }
-}
-
-impl From<&Pos> for (i32, i32) {
-    fn from(val: &Pos) -> Self {
-        (val.0, val.1)
-    }
-}
+use pathfinding::prelude::bfs;
 
 pub fn resolve(grid: &Grid, goals: &[(i32, i32)]) -> Option<Vec<(i32, i32)>> {
     let mut res = vec![];
@@ -54,10 +37,8 @@ mod test {
             grid.block((x, y))
                 .unwrap_or_else(|_| panic!("Failed to block grid slot {};{}", x, y));
         }
-
         let goal = (3, 0);
         let result = resolve(&grid, &[goal]);
         println!("result: {:?}", result);
-        //        assert_eq!(result, [(0, 0), 0])
     }
 }
