@@ -24,6 +24,7 @@ mod grid;
 mod input;
 pub mod level_1;
 pub mod maps;
+pub mod math_utils;
 pub mod towers;
 pub mod workarounds;
 
