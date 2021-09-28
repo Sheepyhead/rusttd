@@ -8,6 +8,7 @@ use std::time::Duration;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
+mod aquamarine;
 mod diamond;
 
 pub struct Plugin;
@@ -15,9 +16,12 @@ pub struct Plugin;
 impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
         app.add_plugin(diamond::Plugin)
+            .add_plugin(aquamarine::Plugin)
             .add_event::<BuildGem>()
             .add_event::<ChooseGem>()
             .add_event::<ProjectileHit>()
+            .insert_resource(RangeDisplay::Off)
+            .add_system(render_range.system())
             .add_system_set(
                 SystemSet::on_update(LevelState::Building).with_system(build_gem.system()),
             )
@@ -26,6 +30,9 @@ impl prelude::Plugin for Plugin {
             )
             .add_system_set(
                 SystemSet::on_update(LevelState::Choosing).with_system(choose_gem.system()),
+            )
+            .add_system_set(
+                SystemSet::on_exit(LevelState::Choosing).with_system(despawn_range_render.system()),
             )
             .add_system(move_projectile.system());
     }
@@ -54,13 +61,13 @@ impl GemType {
             GemType::Diamond => TowerBundle {
                 damage: Damage(20),
                 speed: AttackSpeed(1.2),
-                range: Range(20.0),
+                range: Range(10.0),
                 cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             },
             GemType::Aquamarine => TowerBundle {
                 damage: Damage(10),
                 speed: AttackSpeed(0.8),
-                range: Range(18.0),
+                range: Range(8.0),
                 cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             },
         }
@@ -270,8 +277,64 @@ fn get_closest_creep_within_range(
             closest_distance = distance;
         }
     }
-    if closest_distance >= range * 2.0 {
+
+    if closest_distance >= range.powf(2.0) {
         return None;
     }
+
     closest
+}
+
+#[allow(dead_code)]
+enum RangeDisplay {
+    Off,
+    On(Color),
+}
+
+struct RangeVisualization(Entity);
+
+fn render_range(
+    mut commands: Commands,
+    display: Res<RangeDisplay>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut mats: ResMut<Assets<StandardMaterial>>,
+    towers: Query<(Entity, &GlobalTransform, &Range), Added<Range>>,
+) {
+    if let RangeDisplay::On(color) = *display {
+        let color = Color::rgba(color.r(), color.g(), color.b(), 0.1);
+        for (entity, transform, Range(range)) in towers.iter() {
+            commands
+                .spawn_bundle(PbrBundle {
+                    mesh: meshes.add(
+                        shape::Icosphere {
+                            radius: *range,
+                            subdivisions: 30,
+                        }
+                        .into(),
+                    ),
+                    material: mats.add(color.into()),
+                    visible: Visible {
+                        is_transparent: true,
+                        ..Visible::default()
+                    },
+                    transform: Transform::from_translation(transform.translation),
+                    ..PbrBundle::default()
+                })
+                .insert(RangeVisualization(entity));
+        }
+    }
+}
+
+fn despawn_range_render(
+    mut commands: Commands,
+    removed: Query<Entity, With<Rock>>,
+    ranges: Query<(Entity, &RangeVisualization)>,
+) {
+    for removed_entity in removed.iter() {
+        for (entity, range) in ranges.iter() {
+            if removed_entity == range.0 {
+                commands.entity(entity).despawn_recursive();
+            }
+        }
+    }
 }

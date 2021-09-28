@@ -4,6 +4,7 @@ use crate::{
     grid::Grid,
     level_1::{map, LevelState},
     path::resolve,
+    math_utils,
     towers::{Damage, ProjectileHit},
 };
 
@@ -103,15 +104,17 @@ fn moving(
 ) {
     for (creep_entity, mut transform, mut creep) in creeps.iter_mut() {
         if let Some(destination) = creep.route.get(creep.destination) {
-            let mut direction = Vec3::new(
-                destination.0 as f32,
-                transform.translation.y,
-                destination.1 as f32,
-            ) - transform.translation;
-            direction = direction.normalize();
-            direction *= 5.0 * time.delta_seconds();
-            transform.translation += direction;
+            let speed = 5.0 * time.delta_seconds();
 
+            transform.translation = math_utils::move_towards(
+                transform.translation,
+                Vec3::new(
+                    destination.0 as f32,
+                    transform.translation.y,
+                    destination.1 as f32,
+                ),
+                speed,
+            );
             if (transform.translation.x - destination.0 as f32).abs() <= 0.05
                 && (transform.translation.z - destination.1 as f32).abs() <= 0.05
             {
