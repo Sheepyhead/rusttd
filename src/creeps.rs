@@ -1,7 +1,9 @@
 use bevy::prelude::{self, *};
 
 use crate::{
+    grid::Grid,
     level_1::{map, LevelState},
+    path::resolve,
     math_utils,
     towers::{Damage, ProjectileHit},
 };
@@ -50,6 +52,7 @@ pub struct Creep {
 fn spawn(
     mut commands: Commands,
     time: Res<Time>,
+    grid: Res<Grid>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut spawners: Query<(Entity, &Transform, &mut Spawner)>,
 ) {
@@ -61,10 +64,13 @@ fn spawn(
                 "Spawning creep #{} from {:?}",
                 spawner.amount, spawner_entity
             );
+            let mut route_for_spawner = vec![Grid::to_grid_pos(transform.translation / 2.0)];
+            route_for_spawner.extend(map::CREEP_ROUTE.iter());
+            let route = resolve(&*grid, &route_for_spawner).unwrap_or(map::CREEP_ROUTE.to_vec());
             commands
                 .spawn_bundle((Creep {
                     life: 20,
-                    route: map::CREEP_ROUTE.to_vec(),
+                    route: route.clone(),
                     destination: 0,
                 },))
                 .insert_bundle(PbrBundle {
