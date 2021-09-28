@@ -1,0 +1,43 @@
+use bevy::math::Vec3;
+
+/// Translated from <https://github.com/Unity-Technologies/UnityCsReference/blob/master/Runtime/Export/Math/Vector3.cs#L60>
+pub fn move_towards(current: Vec3, target: Vec3, max_distance_delta: f32) -> Vec3 {
+    let to_vector_x = target.x - current.x;
+    let to_vector_y = target.y - current.y;
+    let to_vector_z = target.z - current.z;
+
+    let sqdist = to_vector_x * to_vector_x + to_vector_y * to_vector_y + to_vector_z * to_vector_z;
+
+    if sqdist == 0.0
+        || (max_distance_delta >= 0.0 && sqdist <= max_distance_delta * max_distance_delta)
+    {
+        return target;
+    }
+    let dist = sqdist.sqrt();
+
+    Vec3::new(
+        current.x + to_vector_x / dist * max_distance_delta,
+        current.y + to_vector_y / dist * max_distance_delta,
+        current.z + to_vector_z / dist * max_distance_delta,
+    )
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn move_towards_done() {
+        let dest = Vec3::new(1.0, 0.0, 0.0);
+        assert_eq!(move_towards(Vec3::new(0.0, 0.0, 0.0), dest, 1.0), dest);
+    }
+    #[test]
+    fn move_towards_not_done() {
+        let target = Vec3::new(3.0, 0.0, 0.0);
+        let actual_dest = Vec3::new(2.0, 0.0, 0.0);
+        assert_eq!(
+            move_towards(Vec3::new(0.0, 0.0, 0.0), target, 2.0),
+            actual_dest
+        );
+    }
+}
