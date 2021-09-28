@@ -38,11 +38,22 @@ impl prelude::Plugin for Plugin {
     }
 }
 
+#[derive(EnumIter)]
 pub enum GemQuality {
     Chipped,
+    Flawed,
+    Normal,
+    Flawless,
+    Perfect,
 }
 
-#[derive(EnumIter)]
+impl Distribution<GemQuality> for Standard {
+    fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> GemQuality {
+        GemQuality::iter().choose(rng).unwrap()
+    }
+}
+
+#[derive(Clone, Copy, EnumIter)]
 pub enum GemType {
     Diamond,
     Aquamarine,
@@ -83,6 +94,20 @@ impl Distribution<GemType> for Standard {
 pub struct Gem {
     pub quality: GemQuality,
     pub r#type: GemType,
+}
+
+impl Gem {
+    fn shape(&self) -> shape::Cube {
+        shape::Cube {
+            size: match self.quality {
+                GemQuality::Chipped => 0.4,
+                GemQuality::Flawed => 0.8,
+                GemQuality::Normal => 1.2,
+                GemQuality::Flawless => 1.6,
+                GemQuality::Perfect => 2.0,
+            },
+        }
+    }
 }
 
 pub struct JustBuilt;
@@ -133,18 +158,19 @@ pub struct ChooseGem {
 fn reveal_gems(
     mut commands: Commands,
     mut mats: ResMut<Assets<StandardMaterial>>,
-    mut gems: Query<(Entity, &mut Handle<StandardMaterial>), With<JustBuilt>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut gems: Query<(Entity, &mut Handle<StandardMaterial>, &mut Handle<Mesh>), With<JustBuilt>>,
 ) {
-    for (entity, mut material) in gems.iter_mut() {
+    for (entity, mut material, mut mesh) in gems.iter_mut() {
         let r#type: GemType = rand::random();
+        let quality: GemQuality = rand::random();
+        let gem = Gem { quality, r#type };
         *material = mats.add(r#type.color().into());
+        *mesh = meshes.add(gem.shape().into());
         commands
             .entity(entity)
             .insert_bundle(r#type.tower())
-            .insert_bundle((Gem {
-                quality: GemQuality::Chipped,
-                r#type,
-            },));
+            .insert_bundle((gem,));
     }
 }
 
@@ -155,7 +181,8 @@ fn choose_gem(
     mut er: EventReader<ChooseGem>,
     grid: ResMut<Grid>,
     mut mats: ResMut<Assets<StandardMaterial>>,
-    mut gems: Query<(Entity, &mut Handle<StandardMaterial>), With<JustBuilt>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut gems: Query<(Entity, &mut Handle<StandardMaterial>, &mut Handle<Mesh>), With<JustBuilt>>,
 ) {
     for ChooseGem { pos } in er.iter() {
         if let Some(chosen_entity) = grid.get(*pos) {
@@ -163,9 +190,10 @@ fn choose_gem(
                 continue;
             }
 
-            for (entity, mut material) in gems.iter_mut() {
+            for (entity, mut material, mut mesh) in gems.iter_mut() {
                 if entity != chosen_entity {
                     *material = mats.add(Color::DARK_GRAY.into());
+                    *mesh = meshes.add(shape::Cube { size: 2.0 }.into());
                     commands
                         .entity(entity)
                         .remove::<Gem>()
