@@ -207,6 +207,8 @@ fn move_projectile(
                 ew.send(ProjectileHit(*projectile));
                 commands.entity(proj_entity).despawn_recursive();
             }
+        } else {
+            commands.entity(proj_entity).despawn_recursive();
         }
     }
 }
