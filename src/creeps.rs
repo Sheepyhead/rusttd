@@ -3,8 +3,8 @@ use bevy::prelude::{self, *};
 use crate::{
     grid::Grid,
     level_1::{map, LevelState},
-    path::resolve,
     math_utils,
+    path::resolve,
     towers::{Damage, ProjectileHit},
 };
 
@@ -66,7 +66,8 @@ fn spawn(
             );
             let mut route_for_spawner = vec![Grid::to_grid_pos(transform.translation / 2.0)];
             route_for_spawner.extend(map::CREEP_ROUTE.iter());
-            let route = resolve(&*grid, &route_for_spawner).unwrap_or(map::CREEP_ROUTE.to_vec());
+            let route =
+                resolve(&*grid, &route_for_spawner).unwrap_or_else(|| map::CREEP_ROUTE.to_vec());
             commands
                 .spawn_bundle((Creep {
                     life: 20,

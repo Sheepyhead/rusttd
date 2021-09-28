@@ -75,7 +75,7 @@ impl Grid {
         }
     }
 
-    pub fn neighbours(&self, p: (i32, i32)) -> Vec<(i32, i32)> {
+    pub fn neighbours(p: (i32, i32)) -> Vec<(i32, i32)> {
         return vec![
             (p.0 + 1, p.1),
             (p.0 - 1, p.1),
