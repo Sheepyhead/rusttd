@@ -1,25 +1,15 @@
 use bevy::math::Vec3;
 
-/// Translated from <https://github.com/Unity-Technologies/UnityCsReference/blob/master/Runtime/Export/Math/Vector3.cs#L60>
 pub fn move_towards(current: Vec3, target: Vec3, max_distance_delta: f32) -> Vec3 {
-    let to_vector_x = target.x - current.x;
-    let to_vector_y = target.y - current.y;
-    let to_vector_z = target.z - current.z;
+    let to_vector = target - current;
 
-    let sqdist = to_vector_x * to_vector_x + to_vector_y * to_vector_y + to_vector_z * to_vector_z;
+    let sqdist = target.distance_squared(current);
 
-    if sqdist == 0.0
-        || (max_distance_delta >= 0.0 && sqdist <= max_distance_delta * max_distance_delta)
-    {
+    if sqdist == 0.0 || (max_distance_delta >= 0.0 && sqdist <= max_distance_delta.powf(2.0)) {
         return target;
     }
     let dist = sqdist.sqrt();
-
-    Vec3::new(
-        current.x + to_vector_x / dist * max_distance_delta,
-        current.y + to_vector_y / dist * max_distance_delta,
-        current.z + to_vector_z / dist * max_distance_delta,
-    )
+    current + to_vector / dist * max_distance_delta
 }
 
 #[cfg(test)]
