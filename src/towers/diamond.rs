@@ -1,8 +1,8 @@
 use super::{
-    ccoldown_is_done, get_closest_creep_within_range, launch_projectile, AttackSpeed, Cooldown,
-    Gem, GemType, Range,
+    cooldown_is_done, get_closest_creep_within_range, launch_projectile, AttackSpeed, Cooldown,
+    Gem, GemQuality, GemType, Range, TowerBundle,
 };
-use crate::{creeps::Creep, level_1::LevelState};
+use crate::{creeps::Creep, level_1::LevelState, towers::Damage};
 use bevy::prelude::{self, *};
 
 pub struct Plugin;
@@ -34,7 +34,7 @@ fn attack(
             continue;
         }
 
-        if !ccoldown_is_done(&mut *cooldown, *speed, &time) {
+        if !cooldown_is_done(&mut *cooldown, *speed, &time) {
             continue;
         }
 
@@ -47,5 +47,40 @@ fn attack(
                 closest_creep,
             );
         }
+    }
+}
+
+pub fn tower(quality: GemQuality) -> TowerBundle {
+    match quality {
+        GemQuality::Chipped => TowerBundle {
+            damage: Damage::Range(8..=12),
+            speed: AttackSpeed(0.5),
+            range: Range(5.0),
+            cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+        },
+        GemQuality::Flawed => TowerBundle {
+            damage: Damage::Range(16..=18),
+            speed: AttackSpeed(0.5),
+            range: Range(5.5),
+            cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+        },
+        GemQuality::Normal => TowerBundle {
+            damage: Damage::Range(30..=37),
+            speed: AttackSpeed(0.5),
+            range: Range(6.0),
+            cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+        },
+        GemQuality::Flawless => TowerBundle {
+            damage: Damage::Range(58..=65),
+            speed: AttackSpeed(0.5),
+            range: Range(6.5),
+            cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+        },
+        GemQuality::Perfect => TowerBundle {
+            damage: Damage::Range(140..=150),
+            speed: AttackSpeed(0.5),
+            range: Range(7.5),
+            cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+        },
     }
 }

@@ -1,4 +1,5 @@
 use bevy::prelude::{self, *};
+use rand::Rng;
 
 use crate::{
     grid::Grid,
@@ -35,7 +36,7 @@ fn start_spawn(mut commands: Commands) {
     info!("Creating spawner");
     commands.spawn_bundle((
         Spawner {
-            amount: 20,
+            amount: 10,
             timer: Timer::from_seconds(1.0, true),
         },
         Transform::from_translation(Vec3::new(-20.0, 0.0, 2.0)),
@@ -174,10 +175,16 @@ fn projectile_hit(
 ) {
     for ProjectileHit(projectile) in er.iter() {
         if let Ok(mut creep) = creeps.get_mut(projectile.target) {
-            if let Ok(Damage(damage)) = towers.get(projectile.origin) {
-                if creep.life >= *damage {
-                    creep.life -= *damage;
-                    info!("Creep {:?} took {} damage", projectile.target, *damage);
+            if let Ok(damage) = towers.get(projectile.origin) {
+                let damage = match damage {
+                    Damage::Range(range) => rand::thread_rng().gen_range(range.clone()),
+                    Damage::Fixed(val) => *val,
+                };
+                info!("Creep {:?} took {} damage", projectile.target, damage);
+                if creep.life >= damage {
+                    creep.life -= damage;
+                } else {
+                    creep.life = 0;
                 }
 
                 if creep.life == 0 {

@@ -4,7 +4,7 @@ use rand::{
     distributions::Standard,
     prelude::{Distribution, IteratorRandom},
 };
-use std::time::Duration;
+use std::{ops::RangeInclusive, time::Duration};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
@@ -38,7 +38,7 @@ impl prelude::Plugin for Plugin {
     }
 }
 
-#[derive(EnumIter)]
+#[derive(Clone, Copy, EnumIter)]
 pub enum GemQuality {
     Chipped,
     Flawed,
@@ -66,23 +66,6 @@ impl GemType {
             GemType::Aquamarine => Color::AQUAMARINE,
         }
     }
-
-    pub fn tower(&self) -> TowerBundle {
-        match self {
-            GemType::Diamond => TowerBundle {
-                damage: Damage(20),
-                speed: AttackSpeed(1.2),
-                range: Range(10.0),
-                cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            },
-            GemType::Aquamarine => TowerBundle {
-                damage: Damage(10),
-                speed: AttackSpeed(0.8),
-                range: Range(8.0),
-                cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            },
-        }
-    }
 }
 
 impl Distribution<GemType> for Standard {
@@ -106,6 +89,13 @@ impl Gem {
                 GemQuality::Flawless => 1.6,
                 GemQuality::Perfect => 2.0,
             },
+        }
+    }
+
+    pub fn tower(&self) -> TowerBundle {
+        match self.r#type {
+            GemType::Diamond => diamond::tower(self.quality),
+            GemType::Aquamarine => aquamarine::tower(self.quality),
         }
     }
 }
@@ -169,7 +159,7 @@ fn reveal_gems(
         *mesh = meshes.add(gem.shape().into());
         commands
             .entity(entity)
-            .insert_bundle(r#type.tower())
+            .insert_bundle(gem.tower())
             .insert_bundle((gem,));
     }
 }
@@ -241,7 +231,10 @@ fn move_projectile(
     }
 }
 
-pub struct Damage(pub u64);
+pub enum Damage {
+    Range(RangeInclusive<u64>),
+    Fixed(u64),
+}
 
 pub struct AttackSpeed(pub f32);
 
@@ -282,7 +275,7 @@ fn launch_projectile(
         });
 }
 
-fn ccoldown_is_done(cooldown: &mut Cooldown, speed: f32, time: &Time) -> bool {
+fn cooldown_is_done(cooldown: &mut Cooldown, speed: f32, time: &Time) -> bool {
     cooldown
         .0
         .set_duration(Duration::from_secs_f32(1.0 * speed));
