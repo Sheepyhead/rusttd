@@ -98,7 +98,6 @@ fn spawn(
 
 #[allow(clippy::cast_precision_loss)]
 fn moving(
-    mut commands: Commands,
     time: Res<Time>,
     mut ew: EventWriter<Death>,
     mut creeps: Query<(Entity, &mut Transform, &mut Creep)>,
@@ -128,34 +127,46 @@ fn moving(
                 creep_entity, creep.life
             );
             ew.send(Death {
-                _remaining_life: Some(creep.life),
+                remaining_life: Some(creep.life),
+                entity: creep_entity,
             });
-            commands.entity(creep_entity).despawn_recursive();
         }
     }
 }
 
 struct Death {
-    _remaining_life: Option<u64>,
+    remaining_life: Option<u64>,
+    entity: Entity,
 }
 
 fn death(
+    mut commands: Commands,
     mut level_state: ResMut<State<LevelState>>,
     mut er: EventReader<Death>,
     creeps: Query<(), With<Creep>>,
 ) {
-    for _ in er.iter() {
-        if creeps.iter().count() == 0 {
-            level_state
-                .set(LevelState::Building)
-                .map_err(|err| error!("Failed to set level state to building: {}", err))
-                .ok();
-        }
+    let mut deaths = 0;
+    for Death {
+        entity,
+        remaining_life,
+    } in er.iter()
+    {
+        deaths += 1;
+        info!(
+            "A death has occurred with {} life left",
+            remaining_life.unwrap_or_default()
+        );
+        commands.entity(*entity).despawn_recursive();
+    }
+    if deaths > 0 && creeps.iter().count() <= deaths {
+        level_state
+            .set(LevelState::Building)
+            .map_err(|err| error!("Failed to set level state to building: {}", err))
+            .ok();
     }
 }
 
 fn projectile_hit(
-    mut commands: Commands,
     mut er: EventReader<ProjectileHit>,
     mut ew: EventWriter<Death>,
     towers: Query<&Damage>,
@@ -171,10 +182,9 @@ fn projectile_hit(
 
                 if creep.life == 0 {
                     ew.send(Death {
-                        _remaining_life: None,
+                        remaining_life: None,
+                        entity: projectile.target,
                     });
-                    commands.entity(projectile.target).despawn_recursive();
-                    info!("Creep {:?} has died", projectile.target);
                 }
             }
         }
