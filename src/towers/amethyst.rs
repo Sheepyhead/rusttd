@@ -25,7 +25,7 @@ fn attack(
         &Range,
         &mut Cooldown,
     )>,
-    creeps: Query<(Entity, &GlobalTransform), With<creeps::Type>>,
+    creeps: Query<(Entity, &GlobalTransform, &creeps::Type)>,
 ) {
     for (gem_entity, gem_position, gem, AttackSpeed(speed), Range(range), mut cooldown) in
         gems.iter_mut()
@@ -38,7 +38,12 @@ fn attack(
             continue;
         }
 
-        if let Some(closest_creep) = get_closest_creep_within_range(&creeps, gem_position, *range) {
+        if let Some(closest_creep) = get_closest_creep_within_range(
+            &creeps,
+            gem_position,
+            *range,
+            Some(creeps::Type::Flying),
+        ) {
             launch_projectile(
                 &mut commands,
                 &mut meshes,

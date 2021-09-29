@@ -78,14 +78,14 @@ fn spawn(
             let route =
                 resolve(&*grid, &route_for_spawner).unwrap_or_else(|| map::CREEP_ROUTE.to_vec());
             commands
-                .spawn_bundle((CreepBundle {
+                .spawn_bundle(CreepBundle {
                     life: Life(20),
                     movement: Movement {
                         route: route.clone(),
                         destination: 0,
                     },
-                    r#type: Type::Flying,
-                },))
+                    r#type: Type::Ground,
+                })
                 .insert_bundle(PbrBundle {
                     mesh: meshes.add(
                         shape::Icosphere {
@@ -209,6 +209,7 @@ fn projectile_hit(
     }
 }
 
+#[derive(Clone, Copy)]
 pub enum Type {
     Ground,
     Flying,

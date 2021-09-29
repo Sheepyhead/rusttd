@@ -317,13 +317,21 @@ fn cooldown_is_done(cooldown: &mut Cooldown, speed: f32, time: &Time) -> bool {
 }
 
 fn get_closest_creep_within_range(
-    creeps: &Query<(Entity, &GlobalTransform), With<creeps::Type>>,
+    creeps: &Query<(Entity, &GlobalTransform, &creeps::Type)>,
     tower_position: &GlobalTransform,
     range: f32,
+    filter: Option<creeps::Type>,
 ) -> Option<Entity> {
     let mut closest = None;
     let mut closest_distance = f32::INFINITY;
-    for (creep, position) in creeps.iter() {
+    for (creep, position, r#type) in creeps.iter() {
+        if let Some(filter) = filter {
+            match (filter, *r#type) {
+                (creeps::Type::Ground, creeps::Type::Ground)
+                | (creeps::Type::Flying, creeps::Type::Flying) => {}
+                _ => continue,
+            }
+        }
         let distance = tower_position
             .translation
             .distance_squared(position.translation);
