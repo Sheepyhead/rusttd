@@ -1,4 +1,4 @@
-use crate::{creeps::Creep, grid::Grid, level_1::LevelState};
+use crate::{creeps, grid::Grid, level_1::LevelState};
 use bevy::prelude::{self, *};
 use rand::{
     distributions::Standard,
@@ -317,7 +317,7 @@ fn cooldown_is_done(cooldown: &mut Cooldown, speed: f32, time: &Time) -> bool {
 }
 
 fn get_closest_creep_within_range(
-    creeps: &Query<(Entity, &GlobalTransform), With<Creep>>,
+    creeps: &Query<(Entity, &GlobalTransform), With<creeps::Type>>,
     tower_position: &GlobalTransform,
     range: f32,
 ) -> Option<Entity> {

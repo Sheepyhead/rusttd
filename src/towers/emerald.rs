@@ -2,7 +2,7 @@ use super::{
     cooldown_is_done, get_closest_creep_within_range, launch_projectile, AttackSpeed, Cooldown,
     Gem, GemQuality, GemType, Range, TowerBundle, BASE_TOWER_SPEED,
 };
-use crate::{creeps::Creep, level_1::LevelState, towers::Damage};
+use crate::{creeps, level_1::LevelState, towers::Damage};
 use bevy::prelude::{self, *};
 
 pub struct Plugin;
@@ -25,7 +25,7 @@ fn attack(
         &Range,
         &mut Cooldown,
     )>,
-    creeps: Query<(Entity, &GlobalTransform), With<Creep>>,
+    creeps: Query<(Entity, &GlobalTransform), With<creeps::Type>>,
 ) {
     for (gem_entity, gem_position, gem, AttackSpeed(speed), Range(range), mut cooldown) in
         gems.iter_mut()

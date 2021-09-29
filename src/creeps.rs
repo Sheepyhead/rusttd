@@ -44,8 +44,16 @@ fn start_spawn(mut commands: Commands) {
     ));
 }
 
-pub struct Creep {
-    life: u64,
+#[derive(Bundle)]
+pub struct CreepBundle {
+    life: Life,
+    movement: Movement,
+    r#type: Type,
+}
+
+pub struct Life(u64);
+
+pub struct Movement {
     route: Vec<(i32, i32)>,
     destination: usize,
 }
@@ -70,10 +78,13 @@ fn spawn(
             let route =
                 resolve(&*grid, &route_for_spawner).unwrap_or_else(|| map::CREEP_ROUTE.to_vec());
             commands
-                .spawn_bundle((Creep {
-                    life: 20,
-                    route: route.clone(),
-                    destination: 0,
+                .spawn_bundle((CreepBundle {
+                    life: Life(20),
+                    movement: Movement {
+                        route: route.clone(),
+                        destination: 0,
+                    },
+                    r#type: Type::Flying,
                 },))
                 .insert_bundle(PbrBundle {
                     mesh: meshes.add(
@@ -101,10 +112,10 @@ fn spawn(
 fn moving(
     time: Res<Time>,
     mut ew: EventWriter<Death>,
-    mut creeps: Query<(Entity, &mut Transform, &mut Creep)>,
+    mut creeps: Query<(Entity, &mut Transform, &mut Movement, &Life)>,
 ) {
-    for (creep_entity, mut transform, mut creep) in creeps.iter_mut() {
-        if let Some(destination) = creep.route.get(creep.destination) {
+    for (creep_entity, mut transform, mut movement, Life(life)) in creeps.iter_mut() {
+        if let Some(destination) = movement.route.get(movement.destination) {
             let speed = 5.0 * time.delta_seconds();
 
             transform.translation = math_utils::move_towards(
@@ -119,16 +130,16 @@ fn moving(
             if (transform.translation.x - destination.0 as f32).abs() <= 0.05
                 && (transform.translation.z - destination.1 as f32).abs() <= 0.05
             {
-                creep.destination += 1;
+                movement.destination += 1;
             }
         } else {
             // The creep has reached the end of its destination
             info!(
                 "Creep {:?} has been leaked with {} life remaining",
-                creep_entity, creep.life
+                creep_entity, life
             );
             ew.send(Death {
-                remaining_life: Some(creep.life),
+                remaining_life: Some(*life),
                 entity: creep_entity,
             });
         }
@@ -144,7 +155,7 @@ fn death(
     mut commands: Commands,
     mut level_state: ResMut<State<LevelState>>,
     mut er: EventReader<Death>,
-    creeps: Query<(), With<Creep>>,
+    creeps: Query<(), With<Type>>,
 ) {
     let mut deaths = 0;
     for Death {
@@ -171,23 +182,23 @@ fn projectile_hit(
     mut er: EventReader<ProjectileHit>,
     mut ew: EventWriter<Death>,
     towers: Query<&Damage>,
-    mut creeps: Query<&mut Creep>,
+    mut creeps: Query<&mut Life>,
 ) {
     for ProjectileHit(projectile) in er.iter() {
-        if let Ok(mut creep) = creeps.get_mut(projectile.target) {
+        if let Ok(mut life) = creeps.get_mut(projectile.target) {
             if let Ok(damage) = towers.get(projectile.origin) {
                 let damage = match damage {
                     Damage::Range(range) => rand::thread_rng().gen_range(range.clone()),
                     Damage::Fixed(val) => *val,
                 };
                 info!("Creep {:?} took {} damage", projectile.target, damage);
-                if creep.life >= damage {
-                    creep.life -= damage;
+                if life.0 >= damage {
+                    life.0 -= damage;
                 } else {
-                    creep.life = 0;
+                    life.0 = 0;
                 }
 
-                if creep.life == 0 {
+                if life.0 == 0 {
                     ew.send(Death {
                         remaining_life: None,
                         entity: projectile.target,
@@ -196,4 +207,9 @@ fn projectile_hit(
             }
         }
     }
+}
+
+pub enum Type {
+    Ground,
+    Flying,
 }
