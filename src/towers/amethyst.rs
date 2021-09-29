@@ -2,7 +2,7 @@ use super::{
     cooldown_is_done, get_closest_creep_within_range, launch_projectile, AttackSpeed, Cooldown,
     Gem, GemQuality, GemType, Range, TowerBundle, BASE_TOWER_SPEED,
 };
-use crate::{creeps, level_1::LevelState, towers::Damage};
+use crate::{abilities::OnHitAbilities, creeps, level_1::LevelState, towers::Damage};
 use bevy::prelude::{self, *};
 
 pub struct Plugin;
@@ -62,30 +62,35 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             speed: AttackSpeed(BASE_TOWER_SPEED - 0.2),
             range: Range(10.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            abilities: OnHitAbilities(vec![]),
         },
         GemQuality::Flawed => TowerBundle {
             damage: Damage::Range(20..=27),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(12.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            abilities: OnHitAbilities(vec![]),
         },
         GemQuality::Normal => TowerBundle {
             damage: Damage::Range(30..=45),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(13.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            abilities: OnHitAbilities(vec![]),
         },
         GemQuality::Flawless => TowerBundle {
             damage: Damage::Range(60..=80),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(13.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            abilities: OnHitAbilities(vec![]),
         },
         GemQuality::Perfect => TowerBundle {
             damage: Damage::Range(140..=170),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(16.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            abilities: OnHitAbilities(vec![]),
         },
     }
 }

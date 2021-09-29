@@ -17,6 +17,7 @@ use bevy_rapier3d::{
 use kurinji::KurinjiPlugin;
 use level_1::assets::{self, GameState};
 
+mod abilities;
 mod camera;
 pub mod creeps;
 pub mod cursor;
@@ -24,8 +25,8 @@ mod grid;
 mod input;
 pub mod level_1;
 pub mod maps;
-pub mod path;
 pub mod math_utils;
+pub mod path;
 pub mod towers;
 pub mod workarounds;
 
@@ -59,5 +60,6 @@ fn main() {
         .add_plugin(input::Plugin)
         .add_plugin(towers::Plugin)
         .add_plugin(creeps::Plugin)
+        .add_plugin(abilities::Plugin)
         .run();
 }

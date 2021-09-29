@@ -2,7 +2,12 @@ use super::{
     cooldown_is_done, get_closest_creep_within_range, launch_projectile, AttackSpeed, Cooldown,
     Gem, GemQuality, GemType, Range, TowerBundle, BASE_TOWER_SPEED,
 };
-use crate::{creeps, level_1::LevelState, towers::Damage};
+use crate::{
+    abilities::{on_hit::OnHit, OnHitAbilities},
+    creeps::{self, Type},
+    level_1::LevelState,
+    towers::Damage,
+};
 use bevy::prelude::{self, *};
 
 pub struct Plugin;
@@ -39,7 +44,7 @@ fn attack(
         }
 
         if let Some(closest_creep) =
-            get_closest_creep_within_range(&creeps, gem_position, *range, None)
+            get_closest_creep_within_range(&creeps, gem_position, *range, Some(Type::Ground))
         {
             launch_projectile(
                 &mut commands,
@@ -53,36 +58,57 @@ fn attack(
 }
 
 pub fn tower(quality: GemQuality) -> TowerBundle {
+    use OnHit::*;
     match quality {
         GemQuality::Chipped => TowerBundle {
             damage: Damage::Range(8..=12),
             speed: AttackSpeed(BASE_TOWER_SPEED - 0.2),
             range: Range(5.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            abilities: OnHitAbilities(vec![MultiplyDamage {
+                chance: 25,
+                multiplier: 2,
+            }]),
         },
         GemQuality::Flawed => TowerBundle {
             damage: Damage::Range(16..=18),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(5.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            abilities: OnHitAbilities(vec![MultiplyDamage {
+                chance: 25,
+                multiplier: 2,
+            }]),
         },
         GemQuality::Normal => TowerBundle {
             damage: Damage::Range(30..=37),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(6.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            abilities: OnHitAbilities(vec![MultiplyDamage {
+                chance: 25,
+                multiplier: 2,
+            }]),
         },
         GemQuality::Flawless => TowerBundle {
             damage: Damage::Range(58..=65),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(6.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            abilities: OnHitAbilities(vec![MultiplyDamage {
+                chance: 25,
+                multiplier: 2,
+            }]),
         },
         GemQuality::Perfect => TowerBundle {
             damage: Damage::Range(140..=150),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(7.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
+            abilities: OnHitAbilities(vec![MultiplyDamage {
+                chance: 25,
+                multiplier: 2,
+            }]),
         },
     }
 }

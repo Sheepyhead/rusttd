@@ -2,6 +2,7 @@ use bevy::prelude::{self, *};
 use rand::Rng;
 
 use crate::{
+    abilities::OnHitAbilities,
     grid::Grid,
     level_1::{map, LevelState},
     math_utils,
@@ -181,16 +182,19 @@ fn death(
 fn projectile_hit(
     mut er: EventReader<ProjectileHit>,
     mut ew: EventWriter<Death>,
-    towers: Query<&Damage>,
+    towers: Query<(&Damage, &OnHitAbilities)>,
     mut creeps: Query<&mut Life>,
 ) {
     for ProjectileHit(projectile) in er.iter() {
         if let Ok(mut life) = creeps.get_mut(projectile.target) {
-            if let Ok(damage) = towers.get(projectile.origin) {
-                let damage = match damage {
+            if let Ok((damage, OnHitAbilities(abilities))) = towers.get(projectile.origin) {
+                let mut damage = match damage {
                     Damage::Range(range) => rand::thread_rng().gen_range(range.clone()),
                     Damage::Fixed(val) => *val,
                 };
+                for on_hit in abilities {
+                    on_hit.apply(&mut damage);
+                }
                 info!("Creep {:?} took {} damage", projectile.target, damage);
                 if life.0 >= damage {
                     life.0 -= damage;

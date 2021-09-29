@@ -1,4 +1,4 @@
-use crate::{creeps, grid::Grid, level_1::LevelState};
+use crate::{abilities::OnHitAbilities, creeps, grid::Grid, level_1::LevelState};
 use bevy::prelude::{self, *};
 use rand::{
     distributions::Standard,
@@ -281,6 +281,7 @@ pub struct TowerBundle {
     speed: AttackSpeed,
     range: Range,
     cooldown: Cooldown,
+    abilities: OnHitAbilities,
 }
 
 fn launch_projectile(
