@@ -147,7 +147,7 @@ fn moving(
     }
 }
 
-struct Death {
+pub struct Death {
     remaining_life: Option<u64>,
     entity: Entity,
 }
@@ -180,36 +180,40 @@ fn death(
 }
 
 fn projectile_hit(
+    mut commands: Commands,
     mut er: EventReader<ProjectileHit>,
     mut ew: EventWriter<Death>,
     towers: Query<(&Damage, &OnHitAbilities)>,
-    mut creeps: Query<&mut Life>,
+    mut creeps: Query<(&GlobalTransform, &mut Life)>,
 ) {
     for ProjectileHit(projectile) in er.iter() {
-        if let Ok(mut life) = creeps.get_mut(projectile.target) {
+        if let Ok((position, mut life)) = creeps.get_mut(projectile.target) {
             if let Ok((damage, OnHitAbilities(abilities))) = towers.get(projectile.origin) {
                 let mut damage = match damage {
                     Damage::Range(range) => rand::thread_rng().gen_range(range.clone()),
                     Damage::Fixed(val) => *val,
                 };
                 for on_hit in abilities {
-                    on_hit.apply(&mut damage);
+                    on_hit.apply(&mut commands, &mut damage, position.translation);
                 }
-                info!("Creep {:?} took {} damage", projectile.target, damage);
-                if life.0 >= damage {
-                    life.0 -= damage;
-                } else {
-                    life.0 = 0;
-                }
-
-                if life.0 == 0 {
-                    ew.send(Death {
-                        remaining_life: None,
-                        entity: projectile.target,
-                    });
-                }
+                damage_creep(projectile.target, damage, &mut life, &mut ew);
             }
         }
+    }
+}
+
+pub fn damage_creep(target: Entity, damage: u64, mut life: &mut Life, ew: &mut EventWriter<Death>) {
+    info!("Creep {:?} took {} damage", target, damage);
+    if life.0 >= damage {
+        life.0 -= damage;
+    } else {
+        life.0 = 0;
+    }
+    if life.0 == 0 {
+        ew.send(Death {
+            remaining_life: None,
+            entity: target,
+        });
     }
 }
 

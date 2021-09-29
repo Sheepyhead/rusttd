@@ -271,6 +271,7 @@ pub enum Damage {
 
 pub struct AttackSpeed(pub f32);
 
+#[derive(Clone, Copy)]
 pub struct Range(pub f32);
 
 pub struct Cooldown(Timer);
