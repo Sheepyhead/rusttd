@@ -1,6 +1,6 @@
 use super::{
     cooldown_is_done, get_closest_creep_within_range, launch_projectile, AttackSpeed, Cooldown,
-    Gem, GemQuality, GemType, Range, TowerBundle,
+    Gem, GemQuality, GemType, Range, TowerBundle, BASE_TOWER_SPEED,
 };
 use crate::{creeps::Creep, level_1::LevelState, towers::Damage};
 use bevy::prelude::{self, *};
@@ -54,31 +54,31 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
     match quality {
         GemQuality::Chipped => TowerBundle {
             damage: Damage::Range(8..=12),
-            speed: AttackSpeed(0.5),
+            speed: AttackSpeed(BASE_TOWER_SPEED - 0.2),
             range: Range(5.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
         },
         GemQuality::Flawed => TowerBundle {
             damage: Damage::Range(16..=18),
-            speed: AttackSpeed(0.5),
+            speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(5.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
         },
         GemQuality::Normal => TowerBundle {
             damage: Damage::Range(30..=37),
-            speed: AttackSpeed(0.5),
+            speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(6.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
         },
         GemQuality::Flawless => TowerBundle {
             damage: Damage::Range(58..=65),
-            speed: AttackSpeed(0.5),
+            speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(6.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
         },
         GemQuality::Perfect => TowerBundle {
             damage: Damage::Range(140..=150),
-            speed: AttackSpeed(0.5),
+            speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(7.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
         },

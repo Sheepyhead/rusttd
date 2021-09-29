@@ -8,6 +8,9 @@ use std::{ops::RangeInclusive, time::Duration};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
+// Most towers attack at a base rate of 1 attack per second
+pub const BASE_TOWER_SPEED: f32 = 1.0;
+
 mod aquamarine;
 mod diamond;
 
