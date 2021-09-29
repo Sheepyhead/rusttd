@@ -80,7 +80,7 @@ fn spawn(
                 resolve(&*grid, &route_for_spawner).unwrap_or_else(|| map::CREEP_ROUTE.to_vec());
             commands
                 .spawn_bundle(CreepBundle {
-                    life: Life(20),
+                    life: Life(2_000_000),
                     movement: Movement {
                         route: route.clone(),
                         destination: 0,

@@ -351,6 +351,28 @@ fn get_closest_creep_within_range(
     closest
 }
 
+fn get_all_creeps_within_range(
+    creeps: &Query<(Entity, &GlobalTransform, &creeps::Type)>,
+    tower_position: &GlobalTransform,
+    range: Range,
+    filter: Option<creeps::Type>,
+) -> Vec<Entity> {
+    creeps
+        .iter()
+        .filter_map(|(entity, transform, r#type)| {
+            if range.within(transform.translation, tower_position.translation) {
+                filter.map_or(Some(entity), |filter| match (filter, *r#type) {
+                    (creeps::Type::Ground, creeps::Type::Ground)
+                    | (creeps::Type::Flying, creeps::Type::Flying) => Some(entity),
+                    _ => None,
+                })
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+
 #[allow(dead_code)]
 enum RangeDisplay {
     Off,
@@ -402,5 +424,19 @@ fn despawn_range_render(
                 commands.entity(entity).despawn_recursive();
             }
         }
+    }
+}
+
+impl Range {
+    pub fn within(&self, target: Vec3, origin: Vec3) -> bool {
+        // Check if within range's bounding box just to avoid the expensive sqrt in distance calc
+        (target.x >= origin.x - (self.0 / 2.0)
+            && target.x <= origin.x + (self.0 / 2.0)
+            && target.z >= origin.z - (self.0 / 2.0)
+            && target.z <= origin.z + (self.0 / 2.0))
+            && (
+                // Now check all within bounding box to make splash circular rather than square
+                target.distance(origin) <= self.0
+            )
     }
 }

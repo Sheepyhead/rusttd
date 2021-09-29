@@ -1,8 +1,13 @@
 use super::{
-    cooldown_is_done, get_closest_creep_within_range, launch_projectile, AttackSpeed, Cooldown,
-    Gem, GemQuality, GemType, Range, TowerBundle, BASE_TOWER_SPEED,
+    cooldown_is_done, launch_projectile, AttackSpeed, Cooldown, Gem, GemQuality, GemType, Range,
+    TowerBundle, BASE_TOWER_SPEED,
 };
-use crate::{abilities::OnHitAbilities, creeps, level_1::LevelState, towers::Damage};
+use crate::{
+    abilities::OnHitAbilities,
+    creeps,
+    level_1::LevelState,
+    towers::{get_all_creeps_within_range, Damage},
+};
 use bevy::prelude::{self, *};
 
 pub struct Plugin;
@@ -27,8 +32,7 @@ fn attack(
     )>,
     creeps: Query<(Entity, &GlobalTransform, &creeps::Type)>,
 ) {
-    for (gem_entity, gem_position, gem, AttackSpeed(speed), Range(range), mut cooldown) in
-        gems.iter_mut()
+    for (gem_entity, gem_position, gem, AttackSpeed(speed), range, mut cooldown) in gems.iter_mut()
     {
         if !matches!(gem.r#type, GemType::Topaz) {
             continue;
@@ -38,16 +42,8 @@ fn attack(
             continue;
         }
 
-        if let Some(closest_creep) =
-            get_closest_creep_within_range(&creeps, gem_position, *range, None)
-        {
-            launch_projectile(
-                &mut commands,
-                &mut meshes,
-                gem_position,
-                gem_entity,
-                closest_creep,
-            );
+        for creep in get_all_creeps_within_range(&creeps, gem_position, *range, None) {
+            launch_projectile(&mut commands, &mut meshes, gem_position, gem_entity, creep);
         }
     }
 }
