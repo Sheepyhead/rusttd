@@ -11,8 +11,14 @@ use strum_macros::EnumIter;
 // Most towers attack at a base rate of 1 attack per second
 pub const BASE_TOWER_SPEED: f32 = 1.0;
 
+mod amethyst;
 mod aquamarine;
 mod diamond;
+mod emerald;
+mod opal;
+mod ruby;
+mod sapphire;
+mod topaz;
 
 pub struct Plugin;
 
@@ -20,6 +26,12 @@ impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
         app.add_plugin(diamond::Plugin)
             .add_plugin(aquamarine::Plugin)
+            .add_plugin(amethyst::Plugin)
+            .add_plugin(emerald::Plugin)
+            .add_plugin(opal::Plugin)
+            .add_plugin(ruby::Plugin)
+            .add_plugin(sapphire::Plugin)
+            .add_plugin(topaz::Plugin)
             .add_event::<BuildGem>()
             .add_event::<ChooseGem>()
             .add_event::<ProjectileHit>()
@@ -60,6 +72,12 @@ impl Distribution<GemQuality> for Standard {
 pub enum GemType {
     Diamond,
     Aquamarine,
+    Ruby,
+    Emerald,
+    Sapphire,
+    Topaz,
+    Opal,
+    Amethyst,
 }
 
 impl GemType {
@@ -67,6 +85,12 @@ impl GemType {
         match self {
             GemType::Diamond => Color::WHITE,
             GemType::Aquamarine => Color::AQUAMARINE,
+            GemType::Ruby => Color::RED,
+            GemType::Emerald => Color::GREEN,
+            GemType::Sapphire => Color::BLUE,
+            GemType::Topaz => Color::YELLOW,
+            GemType::Opal => Color::PURPLE,
+            GemType::Amethyst => Color::PINK,
         }
     }
 }
@@ -99,6 +123,12 @@ impl Gem {
         match self.r#type {
             GemType::Diamond => diamond::tower(self.quality),
             GemType::Aquamarine => aquamarine::tower(self.quality),
+            GemType::Ruby => ruby::tower(self.quality),
+            GemType::Emerald => emerald::tower(self.quality),
+            GemType::Sapphire => sapphire::tower(self.quality),
+            GemType::Topaz => topaz::tower(self.quality),
+            GemType::Opal => opal::tower(self.quality),
+            GemType::Amethyst => amethyst::tower(self.quality),
         }
     }
 }
