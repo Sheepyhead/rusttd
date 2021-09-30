@@ -18,6 +18,7 @@ use kurinji::KurinjiPlugin;
 use level_1::assets::{self, GameState};
 
 mod abilities;
+pub mod buffs;
 mod camera;
 pub mod creeps;
 pub mod cursor;
@@ -61,5 +62,6 @@ fn main() {
         .add_plugin(towers::Plugin)
         .add_plugin(creeps::Plugin)
         .add_plugin(abilities::Plugin)
+        .add_plugin(buffs::Plugin)
         .run();
 }

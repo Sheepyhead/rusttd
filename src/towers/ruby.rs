@@ -4,6 +4,7 @@ use super::{
 };
 use crate::{
     abilities::{
+        aura::Auras,
         on_hit::{OnHit, SplashEffect},
         OnHitAbilities,
     },
@@ -70,6 +71,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             range: Range(8.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![Splash(Multiplier { multiplier: 0.5 }, Range(3.0))]),
+            auras: Auras(vec![]),
         },
         GemQuality::Flawed => TowerBundle {
             damage: Damage::Range(13..=16),
@@ -77,6 +79,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             range: Range(8.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![Splash(Multiplier { multiplier: 0.5 }, Range(3.0))]),
+            auras: Auras(vec![]),
         },
         GemQuality::Normal => TowerBundle {
             damage: Damage::Range(20..=25),
@@ -84,6 +87,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             range: Range(8.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![Splash(Multiplier { multiplier: 0.5 }, Range(3.0))]),
+            auras: Auras(vec![]),
         },
         GemQuality::Flawless => TowerBundle {
             damage: Damage::Range(38..=45),
@@ -91,6 +95,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             range: Range(8.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![Splash(Multiplier { multiplier: 0.5 }, Range(3.0))]),
+            auras: Auras(vec![]),
         },
         GemQuality::Perfect => TowerBundle {
             damage: Damage::Range(80..=100),
@@ -98,6 +103,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             range: Range(8.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![Splash(Multiplier { multiplier: 0.5 }, Range(3.5))]),
+            auras: Auras(vec![]),
         },
     }
 }

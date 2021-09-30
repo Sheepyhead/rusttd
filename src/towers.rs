@@ -1,4 +1,9 @@
-use crate::{abilities::OnHitAbilities, creeps, grid::Grid, level_1::LevelState};
+use crate::{
+    abilities::{aura::Auras, OnHitAbilities},
+    creeps,
+    grid::Grid,
+    level_1::LevelState,
+};
 use bevy::prelude::{self, *};
 use rand::{
     distributions::Standard,
@@ -193,7 +198,7 @@ fn reveal_gems(
         commands
             .entity(entity)
             .insert_bundle(gem.tower())
-            .insert_bundle((gem,));
+            .insert_bundle((gem, Tower));
     }
 }
 
@@ -221,6 +226,7 @@ fn choose_gem(
                         .entity(entity)
                         .remove::<Gem>()
                         .remove_bundle::<TowerBundle>()
+                        .remove::<Tower>()
                         .insert(Rock);
                 }
                 commands.entity(entity).remove::<JustBuilt>();
@@ -276,6 +282,8 @@ pub struct Range(pub f32);
 
 pub struct Cooldown(Timer);
 
+pub struct Tower;
+
 #[derive(Bundle)]
 pub struct TowerBundle {
     damage: Damage,
@@ -283,6 +291,7 @@ pub struct TowerBundle {
     range: Range,
     cooldown: Cooldown,
     abilities: OnHitAbilities,
+    auras: Auras,
 }
 
 fn launch_projectile(
@@ -366,6 +375,23 @@ fn get_all_creeps_within_range(
                     | (creeps::Type::Flying, creeps::Type::Flying) => Some(entity),
                     _ => None,
                 })
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+
+pub fn get_all_towers_within_range(
+    towers: &Query<(Entity, &GlobalTransform), With<Tower>>,
+    tower_position: &Vec3,
+    range: Range,
+) -> Vec<Entity> {
+    towers
+        .iter()
+        .filter_map(|(entity, transform)| {
+            if range.within(transform.translation, *tower_position) {
+                Some(entity)
             } else {
                 None
             }

@@ -5,13 +5,16 @@ use crate::{
 };
 use bevy::prelude::{self, *};
 
+pub mod aura;
 pub mod on_hit;
 
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
-        app.add_system(splash.system());
+        app.add_system(splash.system())
+            .add_system(aura::Auras::apply_aura_to_new_tower.system())
+            .add_system(aura::Auras::apply_new_aura.system());
     }
 }
 

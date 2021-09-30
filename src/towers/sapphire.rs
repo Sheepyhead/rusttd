@@ -2,7 +2,12 @@ use super::{
     cooldown_is_done, get_closest_creep_within_range, launch_projectile, AttackSpeed, Cooldown,
     Gem, GemQuality, GemType, Range, TowerBundle, BASE_TOWER_SPEED,
 };
-use crate::{abilities::OnHitAbilities, creeps, level_1::LevelState, towers::Damage};
+use crate::{
+    abilities::{aura::Auras, OnHitAbilities},
+    creeps,
+    level_1::LevelState,
+    towers::Damage,
+};
 use bevy::prelude::{self, *};
 
 pub struct Plugin;
@@ -60,6 +65,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             range: Range(5.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![]),
+            auras: Auras(vec![]),
         },
         GemQuality::Flawed => TowerBundle {
             damage: Damage::Range(10..=14),
@@ -67,6 +73,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             range: Range(7.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![]),
+            auras: Auras(vec![]),
         },
         GemQuality::Normal => TowerBundle {
             damage: Damage::Range(16..=22),
@@ -74,6 +81,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             range: Range(8.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![]),
+            auras: Auras(vec![]),
         },
         GemQuality::Flawless => TowerBundle {
             damage: Damage::Range(30..=40),
@@ -81,6 +89,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             range: Range(8.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![]),
+            auras: Auras(vec![]),
         },
         GemQuality::Perfect => TowerBundle {
             damage: Damage::Range(60..=80),
@@ -88,6 +97,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             range: Range(14.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![]),
+            auras: Auras(vec![]),
         },
     }
 }
