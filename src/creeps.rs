@@ -70,6 +70,11 @@ impl Speed {
     pub fn reduce(&mut self, modifier: u32) {
         self.modifier += modifier;
     }
+
+    /// Reverse operation of `Speed::reduce`, may fail if not temporally following a corresponding `Speed::reduce` since modifier is currently unsigned
+    pub fn increase(&mut self, modifier: u32) {
+        self.modifier -= modifier;
+    }
 }
 
 pub struct Life(u64);

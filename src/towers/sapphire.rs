@@ -4,7 +4,7 @@ use super::{
 };
 use crate::{
     abilities::{aura::Auras, on_hit::OnHit, OnHitAbilities},
-    creeps,
+    creeps::{self, Speed},
     level_1::LevelState,
     towers::Damage,
 };
@@ -110,18 +110,21 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
 pub struct Slowed(pub u32, pub Timer);
 
 impl Slowed {
-    pub fn added(mut slowed_creeps: Query<&mut Slowed, Added<Slowed>>) {
-        for _slowed in slowed_creeps.iter_mut() {}
+    pub fn added(mut slowed_creeps: Query<(&Slowed, &mut Speed), Added<Slowed>>) {
+        for (slowed, mut speed) in slowed_creeps.iter_mut() {
+            speed.reduce(slowed.0);
+        }
     }
     pub fn system(
         mut commands: Commands,
         time: Res<Time>,
-        mut slowed_creeps: Query<(Entity, &mut Slowed)>,
+        mut slowed_creeps: Query<(Entity, &mut Slowed, &mut Speed)>,
     ) {
-        for (entity, mut slowed) in slowed_creeps.iter_mut() {
+        for (entity, mut slowed, mut speed) in slowed_creeps.iter_mut() {
             slowed.1.tick(time.delta());
             if slowed.1.just_finished() {
                 commands.entity(entity).remove::<Slowed>();
+                speed.increase(slowed.0);
             }
         }
     }
