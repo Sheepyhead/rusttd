@@ -49,7 +49,27 @@ fn start_spawn(mut commands: Commands) {
 pub struct CreepBundle {
     life: Life,
     movement: Movement,
+    speed: Speed,
     r#type: Type,
+}
+
+pub struct Speed {
+    base: f32,
+    min: f32,
+    modifier: u32,
+}
+
+impl Speed {
+    #[allow(clippy::cast_precision_loss)] // Allowed since modifier will never exceed the f32 mantissa
+    pub fn total(&self) -> f32 {
+        let modified = self.base - (((self.modifier as f32) / 100.0) * self.base);
+        self.min.max(modified)
+    }
+
+    /// Reduces speed by the given percent modifier, for instance if modifier = 25 the movement speed is reduced by 25%
+    pub fn reduce(&mut self, modifier: u32) {
+        self.modifier += modifier;
+    }
 }
 
 pub struct Life(u64);
@@ -86,6 +106,11 @@ fn spawn(
                         destination: 0,
                     },
                     r#type: Type::Ground,
+                    speed: Speed {
+                        base: 5.0,
+                        min: 0.2,
+                        modifier: 0,
+                    },
                 })
                 .insert_bundle(PbrBundle {
                     mesh: meshes.add(
@@ -113,11 +138,11 @@ fn spawn(
 fn moving(
     time: Res<Time>,
     mut ew: EventWriter<Death>,
-    mut creeps: Query<(Entity, &mut Transform, &mut Movement, &Life)>,
+    mut creeps: Query<(Entity, &mut Transform, &mut Movement, &Life, &Speed)>,
 ) {
-    for (creep_entity, mut transform, mut movement, Life(life)) in creeps.iter_mut() {
+    for (creep_entity, mut transform, mut movement, Life(life), speed) in creeps.iter_mut() {
         if let Some(destination) = movement.route.get(movement.destination) {
-            let speed = 5.0 * time.delta_seconds();
+            let speed = speed.total() * time.delta_seconds();
 
             transform.translation = math_utils::move_towards(
                 transform.translation,

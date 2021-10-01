@@ -111,9 +111,7 @@ pub struct Slowed(pub u32, pub Timer);
 
 impl Slowed {
     pub fn added(mut slowed_creeps: Query<&mut Slowed, Added<Slowed>>) {
-        for _slowed in slowed_creeps.iter_mut() {
-            info!("Slow has been added to a creep!");
-        }
+        for _slowed in slowed_creeps.iter_mut() {}
     }
     pub fn system(
         mut commands: Commands,
@@ -123,7 +121,6 @@ impl Slowed {
         for (entity, mut slowed) in slowed_creeps.iter_mut() {
             slowed.1.tick(time.delta());
             if slowed.1.just_finished() {
-                info!("Slow has expired on a creep!");
                 commands.entity(entity).remove::<Slowed>();
             }
         }
