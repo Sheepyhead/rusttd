@@ -184,17 +184,17 @@ fn projectile_hit(
     mut er: EventReader<ProjectileHit>,
     mut ew: EventWriter<Death>,
     towers: Query<(&Damage, &OnHitAbilities)>,
-    mut creeps: Query<(&GlobalTransform, &mut Life)>,
+    mut creeps: Query<(Entity, &GlobalTransform, &mut Life)>,
 ) {
     for ProjectileHit(projectile) in er.iter() {
-        if let Ok((position, mut life)) = creeps.get_mut(projectile.target) {
+        if let Ok((target, position, mut life)) = creeps.get_mut(projectile.target) {
             if let Ok((damage, OnHitAbilities(abilities))) = towers.get(projectile.origin) {
                 let mut damage = match damage {
                     Damage::Range(range) => rand::thread_rng().gen_range(range.clone()),
                     Damage::Fixed(val) => *val,
                 };
                 for on_hit in abilities {
-                    on_hit.apply(&mut commands, &mut damage, position.translation);
+                    on_hit.apply(target, &mut commands, &mut damage, position.translation);
                 }
                 damage_creep(projectile.target, damage, &mut life, &mut ew);
             }

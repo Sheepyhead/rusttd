@@ -22,7 +22,7 @@ mod diamond;
 mod emerald;
 mod opal;
 mod ruby;
-mod sapphire;
+pub mod sapphire;
 mod topaz;
 
 pub struct Plugin;

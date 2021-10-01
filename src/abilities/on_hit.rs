@@ -1,12 +1,13 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::towers::{Damage, Range};
+use crate::towers::{sapphire, Damage, Range};
 
 #[derive(Clone, Copy)]
 pub enum OnHit {
     MultiplyDamage { chance: u32, multiplier: u64 },
     Splash(SplashEffect, Range),
+    SapphireSlow(u32),
 }
 
 #[derive(Clone, Copy)]
@@ -15,7 +16,7 @@ pub enum SplashEffect {
 }
 
 impl OnHit {
-    pub fn apply(self, commands: &mut Commands, damage: &mut u64, position: Vec3) {
+    pub fn apply(self, target: Entity, commands: &mut Commands, damage: &mut u64, position: Vec3) {
         match self {
             OnHit::MultiplyDamage { chance, multiplier } => {
                 if rand::thread_rng().gen_range(0..100) <= chance {
@@ -30,6 +31,11 @@ impl OnHit {
                     Transform::from_translation(position),
                     GlobalTransform::default(),
                 ));
+            }
+            OnHit::SapphireSlow(amount) => {
+                commands
+                    .entity(target)
+                    .insert(sapphire::Slowed(amount, Timer::from_seconds(4.0, false)));
             }
         }
     }

@@ -3,7 +3,7 @@ use super::{
     Gem, GemQuality, GemType, Range, TowerBundle, BASE_TOWER_SPEED,
 };
 use crate::{
-    abilities::{aura::Auras, OnHitAbilities},
+    abilities::{aura::Auras, on_hit::OnHit, OnHitAbilities},
     creeps,
     level_1::LevelState,
     towers::Damage,
@@ -14,7 +14,12 @@ pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
-        app.add_system_set(SystemSet::on_update(LevelState::Spawning).with_system(attack.system()));
+        app.add_system_set(
+            SystemSet::on_update(LevelState::Spawning)
+                .with_system(attack.system())
+                .with_system(Slowed::added.system())
+                .with_system(Slowed::system.system()),
+        );
     }
 }
 
@@ -64,7 +69,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             speed: AttackSpeed(BASE_TOWER_SPEED - 0.2),
             range: Range(5.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            abilities: OnHitAbilities(vec![]),
+            abilities: OnHitAbilities(vec![OnHit::SapphireSlow(20)]),
             auras: Auras(vec![]),
         },
         GemQuality::Flawed => TowerBundle {
@@ -72,7 +77,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(7.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            abilities: OnHitAbilities(vec![]),
+            abilities: OnHitAbilities(vec![OnHit::SapphireSlow(25)]),
             auras: Auras(vec![]),
         },
         GemQuality::Normal => TowerBundle {
@@ -80,7 +85,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(8.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            abilities: OnHitAbilities(vec![]),
+            abilities: OnHitAbilities(vec![OnHit::SapphireSlow(30)]),
             auras: Auras(vec![]),
         },
         GemQuality::Flawless => TowerBundle {
@@ -88,7 +93,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(8.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            abilities: OnHitAbilities(vec![]),
+            abilities: OnHitAbilities(vec![OnHit::SapphireSlow(35)]),
             auras: Auras(vec![]),
         },
         GemQuality::Perfect => TowerBundle {
@@ -96,8 +101,31 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(14.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            abilities: OnHitAbilities(vec![]),
+            abilities: OnHitAbilities(vec![OnHit::SapphireSlow(40)]),
             auras: Auras(vec![]),
         },
+    }
+}
+
+pub struct Slowed(pub u32, pub Timer);
+
+impl Slowed {
+    pub fn added(mut slowed_creeps: Query<&mut Slowed, Added<Slowed>>) {
+        for _slowed in slowed_creeps.iter_mut() {
+            info!("Slow has been added to a creep!");
+        }
+    }
+    pub fn system(
+        mut commands: Commands,
+        time: Res<Time>,
+        mut slowed_creeps: Query<(Entity, &mut Slowed)>,
+    ) {
+        for (entity, mut slowed) in slowed_creeps.iter_mut() {
+            slowed.1.tick(time.delta());
+            if slowed.1.just_finished() {
+                info!("Slow has expired on a creep!");
+                commands.entity(entity).remove::<Slowed>();
+            }
+        }
     }
 }
