@@ -19,7 +19,7 @@ pub const BASE_TOWER_SPEED: f32 = 1.0;
 mod amethyst;
 mod aquamarine;
 mod diamond;
-mod emerald;
+pub mod emerald;
 mod opal;
 mod ruby;
 pub mod sapphire;

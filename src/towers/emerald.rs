@@ -3,8 +3,8 @@ use super::{
     Gem, GemQuality, GemType, Range, TowerBundle, BASE_TOWER_SPEED,
 };
 use crate::{
-    abilities::{aura::Auras, OnHitAbilities},
-    creeps,
+    abilities::{aura::Auras, on_hit::OnHit, OnHitAbilities},
+    creeps::{self, damage_creep, Death, Life, Speed},
     level_1::LevelState,
     towers::Damage,
 };
@@ -14,7 +14,12 @@ pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
-        app.add_system_set(SystemSet::on_update(LevelState::Spawning).with_system(attack.system()));
+        app.add_system_set(
+            SystemSet::on_update(LevelState::Spawning)
+                .with_system(attack.system())
+                .with_system(Poison::added.system())
+                .with_system(Poison::system.system()),
+        );
     }
 }
 
@@ -64,7 +69,11 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             speed: AttackSpeed(BASE_TOWER_SPEED - 0.2),
             range: Range(5.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            abilities: OnHitAbilities(vec![]),
+            abilities: OnHitAbilities(vec![OnHit::EmeraldPoison {
+                dps: 2,
+                slow: 15,
+                duration: 3.0,
+            }]),
             auras: Auras(vec![]),
         },
         GemQuality::Flawed => TowerBundle {
@@ -72,7 +81,11 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(5.5),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            abilities: OnHitAbilities(vec![]),
+            abilities: OnHitAbilities(vec![OnHit::EmeraldPoison {
+                dps: 3,
+                slow: 20,
+                duration: 4.0,
+            }]),
             auras: Auras(vec![]),
         },
         GemQuality::Normal => TowerBundle {
@@ -80,7 +93,11 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(6.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            abilities: OnHitAbilities(vec![]),
+            abilities: OnHitAbilities(vec![OnHit::EmeraldPoison {
+                dps: 5,
+                slow: 25,
+                duration: 5.0,
+            }]),
             auras: Auras(vec![]),
         },
         GemQuality::Flawless => TowerBundle {
@@ -88,7 +105,11 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(7.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            abilities: OnHitAbilities(vec![]),
+            abilities: OnHitAbilities(vec![OnHit::EmeraldPoison {
+                dps: 8,
+                slow: 30,
+                duration: 6.0,
+            }]),
             auras: Auras(vec![]),
         },
         GemQuality::Perfect => TowerBundle {
@@ -96,8 +117,41 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(7.0),
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
-            abilities: OnHitAbilities(vec![]),
+            abilities: OnHitAbilities(vec![OnHit::EmeraldPoison {
+                dps: 16,
+                slow: 50,
+                duration: 8.0,
+            }]),
             auras: Auras(vec![]),
         },
+    }
+}
+
+pub struct Poison {
+    pub slow: u32,
+    pub duration_timer: Timer,
+    pub damage_timer: Timer,
+}
+
+impl Poison {
+    pub fn added(mut poisoned_creeps: Query<(&Poison, &mut Speed), Added<Poison>>) {
+        for (poison, mut speed) in poisoned_creeps.iter_mut() {
+            speed.reduce(poison.slow);
+        }
+    }
+    pub fn system(
+        mut commands: Commands,
+        time: Res<Time>,
+        mut ew: EventWriter<Death>,
+        mut poisoned_creeps: Query<(Entity, &mut Poison, &mut Speed, &mut Life)>,
+    ) {
+        for (entity, mut poison, mut speed, mut life) in poisoned_creeps.iter_mut() {
+            if poison.duration_timer.tick(time.delta()).just_finished() {
+                commands.entity(entity).remove::<Poison>();
+                speed.increase(poison.slow);
+            } else if poison.damage_timer.tick(time.delta()).just_finished() {
+                damage_creep(entity, 1, &mut life, &mut ew);
+            }
+        }
     }
 }
