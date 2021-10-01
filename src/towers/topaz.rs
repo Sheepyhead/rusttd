@@ -43,6 +43,8 @@ fn attack(
         }
 
         for creep in get_all_creeps_within_range(&creeps, gem_position, *range, None) {
+            cooldown.0.reset();
+
             launch_projectile(&mut commands, &mut meshes, gem_position, gem_entity, creep);
         }
     }

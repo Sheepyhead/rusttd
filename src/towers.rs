@@ -329,7 +329,7 @@ fn cooldown_is_done(cooldown: &mut Cooldown, speed: f32, time: &Time) -> bool {
         .0
         .set_duration(Duration::from_secs_f32(1.0 * speed));
     cooldown.0.tick(time.delta());
-    cooldown.0.just_finished()
+    cooldown.0.finished()
 }
 
 fn get_closest_creep_within_range(

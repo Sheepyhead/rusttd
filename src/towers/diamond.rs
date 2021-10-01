@@ -1,8 +1,13 @@
 use super::{
-    cooldown_is_done, get_closest_creep_within_range, launch_projectile, AttackSpeed, Cooldown,
-    Gem, GemQuality, GemType, Range, TowerBundle, BASE_TOWER_SPEED,
+    cooldown_is_done, launch_projectile, AttackSpeed, Cooldown, Gem, GemQuality, GemType, Range,
+    TowerBundle, BASE_TOWER_SPEED,
 };
-use crate::{abilities::{aura::Auras, on_hit::OnHit, OnHitAbilities}, creeps::{self, Type}, level_1::LevelState, towers::{Damage, Target}};
+use crate::{
+    abilities::{aura::Auras, on_hit::OnHit, OnHitAbilities},
+    creeps::{self, Type},
+    level_1::LevelState,
+    towers::{Damage, Target},
+};
 use bevy::prelude::{self, *};
 
 pub struct Plugin;
@@ -22,12 +27,12 @@ fn attack(
         &GlobalTransform,
         &Gem,
         &AttackSpeed,
-        &Range,
+        &Target,
         &mut Cooldown,
     )>,
     creeps: Query<(Entity, &GlobalTransform, &creeps::Type)>,
 ) {
-    for (gem_entity, gem_position, gem, AttackSpeed(speed), Range(range), mut cooldown) in
+    for (gem_entity, gem_position, gem, AttackSpeed(speed), Target(target), mut cooldown) in
         gems.iter_mut()
     {
         if !matches!(gem.r#type, GemType::Diamond) {
@@ -38,15 +43,22 @@ fn attack(
             continue;
         }
 
-        if let Some(closest_creep) =
-            get_closest_creep_within_range(&creeps, gem_position, *range, Some(Type::Ground))
-        {
+        if let Some(target) = target {
+            if let Ok(r#type) = creeps.get_component::<Type>(*target) {
+                match r#type {
+                    Type::Ground => {}
+                    Type::Flying => continue,
+                }
+            }
+
+            cooldown.0.reset();
+
             launch_projectile(
                 &mut commands,
                 &mut meshes,
                 gem_position,
                 gem_entity,
-                closest_creep,
+                *target,
             );
         }
     }
