@@ -9,7 +9,7 @@ use crate::{
     },
     creeps,
     level_1::LevelState,
-    towers::Damage,
+    towers::{Damage, Target},
 };
 use bevy::prelude::{self, *};
 
@@ -72,6 +72,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
                 range: Range(6.0),
                 kind: Kind::AttackSpeed(0.1),
             }]),
+            target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
             damage: Damage::Fixed(10),
@@ -83,6 +84,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
                 range: Range(7.0),
                 kind: Kind::AttackSpeed(0.15),
             }]),
+            target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
             damage: Damage::Fixed(20),
@@ -94,6 +96,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
                 range: Range(8.0),
                 kind: Kind::AttackSpeed(0.2),
             }]),
+            target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
             damage: Damage::Fixed(40),
@@ -105,6 +108,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
                 range: Range(9.0),
                 kind: Kind::AttackSpeed(0.25),
             }]),
+            target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
             damage: Damage::Fixed(85),
@@ -116,6 +120,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
                 range: Range(10.0),
                 kind: Kind::AttackSpeed(0.35),
             }]),
+            target: Target::default(),
         },
     }
 }

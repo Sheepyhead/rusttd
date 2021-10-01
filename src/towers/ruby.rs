@@ -10,7 +10,7 @@ use crate::{
     },
     creeps,
     level_1::LevelState,
-    towers::Damage,
+    towers::{Damage, Target},
 };
 use bevy::prelude::{self, *};
 
@@ -72,6 +72,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![Splash(Multiplier { multiplier: 0.5 }, Range(3.0))]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
             damage: Damage::Range(13..=16),
@@ -80,6 +81,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![Splash(Multiplier { multiplier: 0.5 }, Range(3.0))]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
             damage: Damage::Range(20..=25),
@@ -88,6 +90,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![Splash(Multiplier { multiplier: 0.5 }, Range(3.0))]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
             damage: Damage::Range(38..=45),
@@ -96,6 +99,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![Splash(Multiplier { multiplier: 0.5 }, Range(3.0))]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
             damage: Damage::Range(80..=100),
@@ -104,6 +108,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![Splash(Multiplier { multiplier: 0.5 }, Range(3.5))]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
     }
 }

@@ -2,12 +2,7 @@ use super::{
     cooldown_is_done, get_closest_creep_within_range, launch_projectile, AttackSpeed, Cooldown,
     Gem, GemQuality, GemType, Range, TowerBundle, BASE_TOWER_SPEED,
 };
-use crate::{
-    abilities::{aura::Auras, on_hit::OnHit, OnHitAbilities},
-    creeps::{self, Speed},
-    level_1::LevelState,
-    towers::Damage,
-};
+use crate::{abilities::{aura::Auras, on_hit::OnHit, OnHitAbilities}, creeps::{self, Speed}, level_1::LevelState, towers::{Damage, Target}};
 use bevy::prelude::{self, *};
 
 pub struct Plugin;
@@ -71,6 +66,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![OnHit::SapphireSlow(20)]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
             damage: Damage::Range(10..=14),
@@ -79,6 +75,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![OnHit::SapphireSlow(25)]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
             damage: Damage::Range(16..=22),
@@ -87,6 +84,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![OnHit::SapphireSlow(30)]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
             damage: Damage::Range(30..=40),
@@ -95,6 +93,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![OnHit::SapphireSlow(35)]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
             damage: Damage::Range(60..=80),
@@ -103,6 +102,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![OnHit::SapphireSlow(40)]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
     }
 }

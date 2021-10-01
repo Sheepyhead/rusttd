@@ -6,7 +6,7 @@ use crate::{
     abilities::{aura::Auras, OnHitAbilities},
     creeps,
     level_1::LevelState,
-    towers::Damage,
+    towers::{Damage, Target},
 };
 use bevy::prelude::{self, *};
 
@@ -69,6 +69,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
             damage: Damage::Range(20..=27),
@@ -77,6 +78,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
             damage: Damage::Range(30..=45),
@@ -85,6 +87,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
             damage: Damage::Range(60..=80),
@@ -93,6 +96,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
             damage: Damage::Range(140..=170),
@@ -101,6 +105,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             cooldown: Cooldown(Timer::from_seconds(1.0, true)),
             abilities: OnHitAbilities(vec![]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
     }
 }

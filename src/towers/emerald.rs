@@ -6,7 +6,7 @@ use crate::{
     abilities::{aura::Auras, on_hit::OnHit, OnHitAbilities},
     creeps::{self, damage_creep, Death, Life, Speed},
     level_1::LevelState,
-    towers::Damage,
+    towers::{Damage, Target},
 };
 use bevy::prelude::{self, *};
 
@@ -75,6 +75,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
                 duration: 3.0,
             }]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
             damage: Damage::Range(10..=13),
@@ -87,6 +88,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
                 duration: 4.0,
             }]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
             damage: Damage::Range(15..=25),
@@ -99,6 +101,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
                 duration: 5.0,
             }]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
             damage: Damage::Range(30..=37),
@@ -111,6 +114,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
                 duration: 6.0,
             }]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
             damage: Damage::Range(80..=95),
@@ -123,6 +127,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
                 duration: 8.0,
             }]),
             auras: Auras(vec![]),
+            target: Target::default(),
         },
     }
 }

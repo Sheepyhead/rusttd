@@ -54,7 +54,8 @@ impl prelude::Plugin for Plugin {
             .add_system_set(
                 SystemSet::on_exit(LevelState::Choosing).with_system(despawn_range_render.system()),
             )
-            .add_system(move_projectile.system());
+            .add_system(move_projectile.system())
+            .add_system(pick_target.system());
     }
 }
 
@@ -282,6 +283,9 @@ pub struct Range(pub f32);
 
 pub struct Cooldown(Timer);
 
+#[derive(Default)]
+pub struct Target(Option<Entity>);
+
 pub struct Tower;
 
 #[derive(Bundle)]
@@ -292,6 +296,7 @@ pub struct TowerBundle {
     cooldown: Cooldown,
     abilities: OnHitAbilities,
     auras: Auras,
+    target: Target,
 }
 
 fn launch_projectile(
@@ -464,5 +469,24 @@ impl Range {
                 // Now check all within bounding box to make splash circular rather than square
                 target.distance(origin) <= self.0
             )
+    }
+}
+
+fn pick_target(
+    mut towers: Query<(&GlobalTransform, &Range, &mut Target), Without<creeps::Type>>,
+    creeps: Query<(Entity, &GlobalTransform, &creeps::Type)>,
+) {
+    for (tower_pos, range, mut target) in towers.iter_mut() {
+        if let Some(target_entity) = target.0 {
+            if let Ok(creep_pos) = creeps.get_component::<GlobalTransform>(target_entity) {
+                if !range.within(creep_pos.translation, tower_pos.translation) {
+                    target.0 = None;
+                }
+            } else {
+                target.0 = None;
+            }
+        } else {
+            target.0 = get_closest_creep_within_range(&creeps, tower_pos, range.0, None);
+        }
     }
 }
