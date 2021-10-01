@@ -14,9 +14,17 @@ impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
         app.insert_resource(ShowGrid(true))
             .add_system_set(
+                SystemSet::on_enter(LevelState::Building).with_system(activate_cursor.system()),
+            )
+            .add_system_set(
                 SystemSet::on_update(LevelState::Building)
                     .with_system(render_grid.system())
                     .with_system(build_on_click.system()),
+            )
+            .add_system_set(
+                SystemSet::on_exit(LevelState::Building)
+                    .with_system(deactivate_cursor.system().label("deactivate"))
+                    .with_system(render_grid.system().after("deactivate")),
             )
             .add_system_set(
                 SystemSet::on_update(LevelState::Choosing).with_system(choose_on_click.system()),
@@ -28,6 +36,13 @@ impl prelude::Plugin for Plugin {
 pub struct ShowGrid(bool);
 
 pub struct Grid;
+fn activate_cursor(mut show: ResMut<ShowGrid>) {
+    show.0 = true;
+}
+
+fn deactivate_cursor(mut show: ResMut<ShowGrid>) {
+    show.0 = false;
+}
 
 fn render_grid(
     mut commands: Commands,
