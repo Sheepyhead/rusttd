@@ -58,6 +58,7 @@ fn attack(
 pub fn tower(quality: GemQuality) -> TowerBundle {
     match quality {
         GemQuality::Chipped => TowerBundle {
+            name: Name::new("Chipped aquamarine"),
             damage: Damage::Range(6..=8),
             speed: AttackSpeed(BASE_TOWER_SPEED / 2.0),
             range: Range(3.5),
@@ -67,6 +68,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
+            name: Name::new("Flawed aquamarine"),
             damage: Damage::Range(12..=15),
             speed: AttackSpeed(BASE_TOWER_SPEED / 2.0),
             range: Range(3.65),
@@ -76,6 +78,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
+            name: Name::new("Aquamarine"),
             damage: Damage::Range(24..=30),
             speed: AttackSpeed(BASE_TOWER_SPEED / 2.0),
             range: Range(3.8),
@@ -85,6 +88,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
+            name: Name::new("Flawless aquamarine"),
             damage: Damage::Range(48..=55),
             speed: AttackSpeed(BASE_TOWER_SPEED / 2.0),
             range: Range(4.0),
@@ -94,6 +98,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
+            name: Name::new("Perfect aquamarine"),
             damage: Damage::Range(100..=120),
             speed: AttackSpeed(BASE_TOWER_SPEED / 2.0),
             range: Range(5.5),

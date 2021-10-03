@@ -68,6 +68,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
     use OnHit::*;
     match quality {
         GemQuality::Chipped => TowerBundle {
+            name: Name::new("Chipped diamond"),
             damage: Damage::Range(8..=12),
             speed: AttackSpeed(BASE_TOWER_SPEED - 0.2),
             range: Range(5.0),
@@ -80,6 +81,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
+            name: Name::new("Flawed diamond"),
             damage: Damage::Range(16..=18),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(5.5),
@@ -92,6 +94,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
+            name: Name::new("Diamond"),
             damage: Damage::Range(30..=37),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(6.0),
@@ -104,6 +107,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
+            name: Name::new("Flawless diamond"),
             damage: Damage::Range(58..=65),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(6.5),
@@ -116,6 +120,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
+            name: Name::new("Perfect diamond"),
             damage: Damage::Range(140..=150),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(7.5),

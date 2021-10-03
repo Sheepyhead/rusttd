@@ -58,6 +58,7 @@ fn attack(
 pub fn tower(quality: GemQuality) -> TowerBundle {
     match quality {
         GemQuality::Chipped => TowerBundle {
+            name: Name::new("Chipped amethyst"),
             damage: Damage::Range(10..=15),
             speed: AttackSpeed(BASE_TOWER_SPEED - 0.2),
             range: Range(10.0),
@@ -67,6 +68,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
+            name: Name::new("Flawed amethyst"),
             damage: Damage::Range(20..=27),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(12.0),
@@ -76,6 +78,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
+            name: Name::new("Amethyst"),
             damage: Damage::Range(30..=45),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(13.0),
@@ -85,6 +88,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
+            name: Name::new("Flawless amethyst"),
             damage: Damage::Range(60..=80),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(13.5),
@@ -94,6 +98,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
+            name: Name::new("Perfect amethyst"),
             damage: Damage::Range(140..=170),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(16.0),

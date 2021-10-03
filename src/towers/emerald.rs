@@ -64,6 +64,7 @@ fn attack(
 pub fn tower(quality: GemQuality) -> TowerBundle {
     match quality {
         GemQuality::Chipped => TowerBundle {
+            name: Name::new("Chipped emerald"),
             damage: Damage::Range(4..=7),
             speed: AttackSpeed(BASE_TOWER_SPEED - 0.2),
             range: Range(5.0),
@@ -77,6 +78,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
+            name: Name::new("Flawed emerald"),
             damage: Damage::Range(10..=13),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(5.5),
@@ -90,6 +92,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
+            name: Name::new("Emerald"),
             damage: Damage::Range(15..=25),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(6.0),
@@ -103,6 +106,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
+            name: Name::new("Flawless emerald"),
             damage: Damage::Range(30..=37),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(7.0),
@@ -116,6 +120,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
+            name: Name::new("Perfect emerald"),
             damage: Damage::Range(80..=95),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(7.0),

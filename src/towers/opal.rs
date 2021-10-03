@@ -61,6 +61,7 @@ fn attack(
 pub fn tower(quality: GemQuality) -> TowerBundle {
     match quality {
         GemQuality::Chipped => TowerBundle {
+            name: Name::new("Chipped opal"),
             damage: Damage::Fixed(5),
             speed: AttackSpeed(BASE_TOWER_SPEED - 0.2),
             range: Range(6.0),
@@ -73,6 +74,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
+            name: Name::new("Flawed opal"),
             damage: Damage::Fixed(10),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(7.0),
@@ -85,6 +87,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
+            name: Name::new("Opal"),
             damage: Damage::Fixed(20),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(8.0),
@@ -97,6 +100,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
+            name: Name::new("Flawless opal"),
             damage: Damage::Fixed(40),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(9.0),
@@ -109,6 +113,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
+            name: Name::new("Perfect opal"),
             damage: Damage::Fixed(85),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(10.0),

@@ -53,6 +53,7 @@ fn attack(
 pub fn tower(quality: GemQuality) -> TowerBundle {
     match quality {
         GemQuality::Chipped => TowerBundle {
+            name: Name::new("Chipped topaz"),
             damage: Damage::Fixed(4),
             speed: AttackSpeed(BASE_TOWER_SPEED - 0.2),
             range: Range(5.0),
@@ -62,6 +63,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
+            name: Name::new("Flawed topaz"),
             damage: Damage::Fixed(8),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(5.0),
@@ -71,6 +73,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
+            name: Name::new("Topaz"),
             damage: Damage::Fixed(14),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(5.0),
@@ -80,6 +83,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
+            name: Name::new("Flawless topaz"),
             damage: Damage::Fixed(25),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(5.0),
@@ -89,6 +93,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
+            name: Name::new("Perfect topaz"),
             damage: Damage::Fixed(75),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(5.0),

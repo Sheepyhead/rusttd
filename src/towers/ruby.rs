@@ -64,6 +64,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
     use SplashEffect::*;
     match quality {
         GemQuality::Chipped => TowerBundle {
+            name: Name::new("Chipped ruby"),
             damage: Damage::Range(8..=9),
             speed: AttackSpeed(BASE_TOWER_SPEED - 0.2),
             range: Range(8.0),
@@ -73,6 +74,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawed => TowerBundle {
+            name: Name::new("Flawed ruby"),
             damage: Damage::Range(13..=16),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(8.0),
@@ -82,6 +84,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Normal => TowerBundle {
+            name: Name::new("Ruby"),
             damage: Damage::Range(20..=25),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(8.0),
@@ -91,6 +94,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Flawless => TowerBundle {
+            name: Name::new("Flawless ruby"),
             damage: Damage::Range(38..=45),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(8.0),
@@ -100,6 +104,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
             target: Target::default(),
         },
         GemQuality::Perfect => TowerBundle {
+            name: Name::new("Perfect ruby"),
             damage: Damage::Range(80..=100),
             speed: AttackSpeed(BASE_TOWER_SPEED),
             range: Range(8.0),

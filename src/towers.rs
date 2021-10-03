@@ -1,10 +1,11 @@
 use crate::{
     abilities::{aura::Auras, OnHitAbilities},
-    creeps,
+    buffs, creeps,
     grid::Grid,
     level_1::LevelState,
 };
 use bevy::prelude::{self, *};
+use bevy_inspector_egui::{widgets::InspectorQuery, InspectorPlugin};
 use rand::{
     distributions::Standard,
     prelude::{Distribution, IteratorRandom},
@@ -290,6 +291,7 @@ pub struct Tower;
 
 #[derive(Bundle)]
 pub struct TowerBundle {
+    name: Name,
     damage: Damage,
     speed: AttackSpeed,
     range: Range,
@@ -388,13 +390,13 @@ fn get_all_creeps_within_range(
 }
 
 pub fn get_all_towers_within_range(
-    towers: &Query<(Entity, &GlobalTransform), With<Tower>>,
+    towers: &Query<(Entity, &GlobalTransform, Option<&buffs::AttackSpeed>), With<Tower>>,
     tower_position: &Vec3,
     range: Range,
 ) -> Vec<Entity> {
     towers
         .iter()
-        .filter_map(|(entity, transform)| {
+        .filter_map(|(entity, transform, _)| {
             if range.within(transform.translation, *tower_position) {
                 Some(entity)
             } else {
