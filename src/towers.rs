@@ -5,7 +5,6 @@ use crate::{
     level_1::LevelState,
 };
 use bevy::prelude::{self, *};
-use bevy_inspector_egui::{widgets::InspectorQuery, InspectorPlugin};
 use rand::{
     distributions::Standard,
     prelude::{Distribution, IteratorRandom},

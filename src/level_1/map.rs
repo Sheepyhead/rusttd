@@ -1,4 +1,8 @@
-use crate::{grid::Grid, maps::Ground};
+use crate::{
+    creeps::{self, CreepBundle, Life, Movement, Speed},
+    grid::Grid,
+    maps::Ground,
+};
 use bevy::prelude::{shape::Plane, *};
 use bevy_mod_picking::PickableBundle;
 
@@ -86,5 +90,434 @@ pub fn build_grid(mut grid: ResMut<Grid>) {
                     .unwrap_or_else(|_| panic!("Failed to block grid slot {};{}", x, y));
             }
         }
+    }
+}
+
+pub fn get_creep(level: u32) -> CreepBundle {
+    let movement = Movement {
+        route: CREEP_ROUTE.into(),
+        destination: 0,
+    };
+    match level {
+        1 => CreepBundle {
+            life: Life(10),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        2 => CreepBundle {
+            life: Life(30),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        3 => CreepBundle {
+            life: Life(55),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        4 => CreepBundle {
+            life: Life(70),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Flying,
+        },
+        5 => CreepBundle {
+            life: Life(90),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        6 => CreepBundle {
+            life: Life(120),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        7 => CreepBundle {
+            life: Life(178),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        8 => CreepBundle {
+            life: Life(240),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Flying,
+        },
+        9 => CreepBundle {
+            life: Life(300),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        10 => CreepBundle {
+            life: Life(470),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        11 => CreepBundle {
+            life: Life(490),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        12 => CreepBundle {
+            life: Life(450),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Flying,
+        },
+        13 => CreepBundle {
+            life: Life(570),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        14 => CreepBundle {
+            life: Life(650),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        15 => CreepBundle {
+            life: Life(1000),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        16 => CreepBundle {
+            life: Life(725),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Flying,
+        },
+        17 => CreepBundle {
+            life: Life(1350),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        18 => CreepBundle {
+            life: Life(1550),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        19 => CreepBundle {
+            life: Life(1950),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        20 => CreepBundle {
+            life: Life(1350),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Flying,
+        },
+        21 => CreepBundle {
+            life: Life(2300),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        22 => CreepBundle {
+            life: Life(2530),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        23 => CreepBundle {
+            life: Life(3000),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        24 => CreepBundle {
+            life: Life(2500),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Flying,
+        },
+        25 => CreepBundle {
+            life: Life(3750),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        26 => CreepBundle {
+            life: Life(4500),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        27 => CreepBundle {
+            life: Life(5000),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        28 => CreepBundle {
+            life: Life(4150),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Flying,
+        },
+        29 => CreepBundle {
+            life: Life(6750),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        30 => CreepBundle {
+            life: Life(7150),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        31 => CreepBundle {
+            life: Life(8000),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        32 => CreepBundle {
+            life: Life(6200),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Flying,
+        },
+        33 => CreepBundle {
+            life: Life(9550),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        34 => CreepBundle {
+            life: Life(10200),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        35 => CreepBundle {
+            life: Life(11500),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        36 => CreepBundle {
+            life: Life(8500),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Flying,
+        },
+        37 => CreepBundle {
+            life: Life(13000),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        38 => CreepBundle {
+            life: Life(15000),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        39 => CreepBundle {
+            life: Life(17000),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        40 => CreepBundle {
+            life: Life(10500),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Flying,
+        },
+        41 => CreepBundle {
+            life: Life(19500),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
+        _ => CreepBundle {
+            life: Life(23000),
+            movement,
+            speed: Speed {
+                base: 5.0,
+                min: 0.2,
+                modifier: 0,
+            },
+            r#type: creeps::Type::Ground,
+        },
     }
 }

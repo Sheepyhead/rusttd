@@ -1,5 +1,5 @@
 use self::assets::GameState;
-use crate::{towers::JustBuilt, workarounds::clear_input_events};
+use crate::{maps::Level, towers::JustBuilt, workarounds::clear_input_events};
 use bevy::prelude::{self, *};
 
 pub mod assets;
@@ -10,6 +10,7 @@ pub struct Plugin;
 impl prelude::Plugin for Plugin {
     fn build(&self, app: &mut prelude::AppBuilder) {
         app.add_state(LevelState::Building)
+            .insert_resource(Level(1))
             .add_system_set(
                 SystemSet::on_enter(GameState::Play)
                     .with_system(map::build_ground.system().after("Build grid"))
@@ -23,6 +24,9 @@ impl prelude::Plugin for Plugin {
             )
             .add_system_set(
                 SystemSet::on_update(LevelState::Choosing).with_system(choose_one.system()),
+            )
+            .add_system_set(
+                SystemSet::on_exit(LevelState::Spawning).with_system(increment_level.system()),
             );
     }
 }
@@ -32,6 +36,10 @@ pub enum LevelState {
     Building,
     Choosing,
     Spawning,
+}
+
+fn increment_level(mut level: ResMut<Level>) {
+    level.0 += 1;
 }
 
 fn build_five(

@@ -1,14 +1,17 @@
-use bevy::prelude::{self, *};
-use rand::Rng;
-
 use crate::{
     abilities::OnHitAbilities,
     grid::Grid,
-    level_1::{map, LevelState},
+    level_1::{
+        map::{self, get_creep},
+        LevelState,
+    },
+    maps::Level,
     math_utils,
     path::resolve,
     towers::{Damage, ProjectileHit},
 };
+use bevy::prelude::{self, *};
+use rand::Rng;
 
 pub struct Plugin;
 
@@ -34,7 +37,6 @@ struct Spawner {
 }
 
 fn start_spawn(mut commands: Commands) {
-    info!("Creating spawner");
     commands.spawn_bundle((
         Spawner {
             amount: 10,
@@ -47,16 +49,16 @@ fn start_spawn(mut commands: Commands) {
 
 #[derive(Bundle)]
 pub struct CreepBundle {
-    life: Life,
-    movement: Movement,
-    speed: Speed,
-    r#type: Type,
+    pub life: Life,
+    pub movement: Movement,
+    pub speed: Speed,
+    pub r#type: Type,
 }
 
 pub struct Speed {
-    base: f32,
-    min: f32,
-    modifier: u32,
+    pub base: f32,
+    pub min: f32,
+    pub modifier: u32,
 }
 
 impl Speed {
@@ -77,17 +79,18 @@ impl Speed {
     }
 }
 
-pub struct Life(u64);
+pub struct Life(pub u64);
 
 pub struct Movement {
-    route: Vec<(i32, i32)>,
-    destination: usize,
+    pub route: Vec<(i32, i32)>,
+    pub destination: usize,
 }
 
 fn spawn(
     mut commands: Commands,
     time: Res<Time>,
     grid: Res<Grid>,
+    level: Res<Level>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut spawners: Query<(Entity, &Transform, &mut Spawner)>,
 ) {
@@ -95,44 +98,31 @@ fn spawn(
         spawner.timer.tick(time.delta());
 
         if spawner.timer.just_finished() {
-            info!(
-                "Spawning creep #{} from {:?}",
-                spawner.amount, spawner_entity
-            );
-            let mut route_for_spawner = vec![Grid::to_grid_pos(transform.translation / 2.0)];
-            route_for_spawner.extend(map::CREEP_ROUTE.iter());
-            let route =
-                resolve(&*grid, &route_for_spawner).unwrap_or_else(|| map::CREEP_ROUTE.to_vec());
-            commands
-                .spawn_bundle(CreepBundle {
-                    life: Life(2_000_000),
-                    movement: Movement {
-                        route: route.clone(),
-                        destination: 0,
-                    },
-                    r#type: Type::Ground,
-                    speed: Speed {
-                        base: 5.0,
-                        min: 0.2,
-                        modifier: 0,
-                    },
-                })
-                .insert_bundle(PbrBundle {
-                    mesh: meshes.add(
-                        shape::Icosphere {
-                            radius: 0.5,
-                            subdivisions: 10,
-                        }
-                        .into(),
-                    ),
-                    transform: *transform,
-                    ..PbrBundle::default()
-                });
+            let mut creep = get_creep(level.0);
+
+            // Only use pathfinding for ground creeps
+            if let Type::Ground = creep.r#type {
+                let mut route_for_spawner = vec![Grid::to_grid_pos(transform.translation / 2.0)];
+                route_for_spawner.extend(creep.movement.route);
+                creep.movement.route = resolve(&*grid, &route_for_spawner)
+                    .unwrap_or_else(|| map::CREEP_ROUTE.to_vec());
+            }
+
+            commands.spawn_bundle(creep).insert_bundle(PbrBundle {
+                mesh: meshes.add(
+                    shape::Icosphere {
+                        radius: 0.5,
+                        subdivisions: 10,
+                    }
+                    .into(),
+                ),
+                transform: *transform,
+                ..PbrBundle::default()
+            });
 
             spawner.amount -= 1;
 
             if spawner.amount == 0 {
-                info!("Despawning spawner {:?}", spawner_entity);
                 commands.entity(spawner_entity).despawn_recursive();
             }
         }
@@ -165,10 +155,7 @@ fn moving(
             }
         } else {
             // The creep has reached the end of its destination
-            info!(
-                "Creep {:?} has been leaked with {} life remaining",
-                creep_entity, life
-            );
+
             ew.send(Death {
                 remaining_life: Some(*life),
                 entity: creep_entity,
@@ -191,14 +178,11 @@ fn death(
     let mut deaths = 0;
     for Death {
         entity,
-        remaining_life,
+        remaining_life: _remaining_life,
     } in er.iter()
     {
         deaths += 1;
-        info!(
-            "A death has occurred with {} life left",
-            remaining_life.unwrap_or_default()
-        );
+
         commands.entity(*entity).despawn_recursive();
     }
     if deaths > 0 && creeps.iter().count() <= deaths {
@@ -233,7 +217,6 @@ fn projectile_hit(
 }
 
 pub fn damage_creep(target: Entity, damage: u64, mut life: &mut Life, ew: &mut EventWriter<Death>) {
-    info!("Creep {:?} took {} damage", target, damage);
     if life.0 >= damage {
         life.0 -= damage;
     } else {
