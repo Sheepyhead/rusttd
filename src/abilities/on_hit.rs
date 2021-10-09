@@ -11,7 +11,7 @@ pub enum OnHit {
     EmeraldPoison { dps: u32, slow: u32, duration: f32 },
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Component, Copy)]
 pub enum SplashEffect {
     Multiplier { multiplier: f32 },
 }

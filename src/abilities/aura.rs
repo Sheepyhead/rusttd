@@ -4,6 +4,7 @@ use crate::{
 };
 use bevy::prelude::*;
 
+#[derive(Component)]
 pub struct Auras(pub Vec<Aura>);
 
 pub struct Aura {
@@ -27,8 +28,8 @@ impl Auras {
                 for tower in get_all_towers_within_range(&towers, &position, *range) {
                     match kind {
                         Kind::AttackSpeed(val) => {
-                            if let Ok(Some(buffs::AttackSpeed(existing_buff))) =
-                                towers.get_component::<Option<&AttackSpeed>>(tower)
+                            if let Ok(buffs::AttackSpeed(existing_buff)) =
+                                towers.get_component::<AttackSpeed>(tower)
                             {
                                 if existing_buff < val {
                                     commands.entity(tower).insert(buffs::AttackSpeed(*val));

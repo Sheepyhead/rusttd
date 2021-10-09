@@ -8,26 +8,20 @@ pub mod map;
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
-    fn build(&self, app: &mut prelude::AppBuilder) {
+    fn build(&self, app: &mut prelude::App) {
         app.add_state(LevelState::Building)
             .insert_resource(Level(1))
             .add_system_set(
                 SystemSet::on_enter(GameState::Play)
-                    .with_system(map::build_ground.system().after("Build grid"))
-                    .with_system(map::build_grid.system().label("Build grid")),
+                    .with_system(map::build_ground.after("Build grid"))
+                    .with_system(map::build_grid.label("Build grid")),
             )
+            .add_system_set(SystemSet::on_update(LevelState::Building).with_system(build_five))
             .add_system_set(
-                SystemSet::on_update(LevelState::Building).with_system(build_five.system()),
+                SystemSet::on_enter(LevelState::Choosing).with_system(clear_input_events),
             )
-            .add_system_set(
-                SystemSet::on_enter(LevelState::Choosing).with_system(clear_input_events.system()),
-            )
-            .add_system_set(
-                SystemSet::on_update(LevelState::Choosing).with_system(choose_one.system()),
-            )
-            .add_system_set(
-                SystemSet::on_exit(LevelState::Spawning).with_system(increment_level.system()),
-            );
+            .add_system_set(SystemSet::on_update(LevelState::Choosing).with_system(choose_one))
+            .add_system_set(SystemSet::on_exit(LevelState::Spawning).with_system(increment_level));
     }
 }
 

@@ -28,7 +28,7 @@ mod topaz;
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
-    fn build(&self, app: &mut prelude::AppBuilder) {
+    fn build(&self, app: &mut prelude::App) {
         app.add_plugin(diamond::Plugin)
             .add_plugin(aquamarine::Plugin)
             .add_plugin(amethyst::Plugin)
@@ -41,21 +41,15 @@ impl prelude::Plugin for Plugin {
             .add_event::<ChooseGem>()
             .add_event::<ProjectileHit>()
             .insert_resource(RangeDisplay::Off)
-            .add_system(render_range.system())
+            .add_system(render_range)
+            .add_system_set(SystemSet::on_update(LevelState::Building).with_system(build_gem))
+            .add_system_set(SystemSet::on_enter(LevelState::Choosing).with_system(reveal_gems))
+            .add_system_set(SystemSet::on_update(LevelState::Choosing).with_system(choose_gem))
             .add_system_set(
-                SystemSet::on_update(LevelState::Building).with_system(build_gem.system()),
+                SystemSet::on_exit(LevelState::Choosing).with_system(despawn_range_render),
             )
-            .add_system_set(
-                SystemSet::on_enter(LevelState::Choosing).with_system(reveal_gems.system()),
-            )
-            .add_system_set(
-                SystemSet::on_update(LevelState::Choosing).with_system(choose_gem.system()),
-            )
-            .add_system_set(
-                SystemSet::on_exit(LevelState::Choosing).with_system(despawn_range_render.system()),
-            )
-            .add_system(move_projectile.system())
-            .add_system(pick_target.system());
+            .add_system(move_projectile)
+            .add_system(pick_target);
     }
 }
 
@@ -107,6 +101,7 @@ impl Distribution<GemType> for Standard {
     }
 }
 
+#[derive(Component)]
 pub struct Gem {
     pub quality: GemQuality,
     pub r#type: GemType,
@@ -139,6 +134,7 @@ impl Gem {
     }
 }
 
+#[derive(Component)]
 pub struct JustBuilt;
 
 pub struct BuildGem {
@@ -203,6 +199,7 @@ fn reveal_gems(
     }
 }
 
+#[derive(Component)]
 pub struct Rock;
 
 fn choose_gem(
@@ -236,7 +233,7 @@ fn choose_gem(
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Component, Copy)]
 pub struct Projectile {
     pub origin: Entity,
     pub target: Entity,
@@ -271,21 +268,25 @@ fn move_projectile(
     }
 }
 
+#[derive(Component)]
 pub enum Damage {
     Range(RangeInclusive<u64>),
     Fixed(u64),
 }
 
+#[derive(Component)]
 pub struct AttackSpeed(pub f32);
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Component, Copy)]
 pub struct Range(pub f32);
 
+#[derive(Component)]
 pub struct Cooldown(Timer);
 
-#[derive(Default)]
+#[derive(Component, Default)]
 pub struct Target(Option<Entity>);
 
+#[derive(Component)]
 pub struct Tower;
 
 #[derive(Bundle)]
@@ -411,6 +412,7 @@ enum RangeDisplay {
     On(Color),
 }
 
+#[derive(Component)]
 struct RangeVisualization(Entity);
 
 fn render_range(

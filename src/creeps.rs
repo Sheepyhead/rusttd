@@ -16,21 +16,20 @@ use rand::Rng;
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
-    fn build(&self, app: &mut prelude::AppBuilder) {
+    fn build(&self, app: &mut prelude::App) {
         app.add_event::<Death>()
-            .add_system_set(
-                SystemSet::on_enter(LevelState::Spawning).with_system(start_spawn.system()),
-            )
+            .add_system_set(SystemSet::on_enter(LevelState::Spawning).with_system(start_spawn))
             .add_system_set(
                 SystemSet::on_update(LevelState::Spawning)
-                    .with_system(spawn.system())
-                    .with_system(moving.system())
-                    .with_system(death.system())
-                    .with_system(projectile_hit.system()),
+                    .with_system(spawn)
+                    .with_system(moving)
+                    .with_system(death)
+                    .with_system(projectile_hit),
             );
     }
 }
 
+#[derive(Component)]
 struct Spawner {
     amount: u32,
     timer: Timer,
@@ -55,6 +54,7 @@ pub struct CreepBundle {
     pub r#type: Type,
 }
 
+#[derive(Component)]
 pub struct Speed {
     pub base: f32,
     pub min: f32,
@@ -79,8 +79,10 @@ impl Speed {
     }
 }
 
+#[derive(Component)]
 pub struct Life(pub u64);
 
+#[derive(Component)]
 pub struct Movement {
     pub route: Vec<(i32, i32)>,
     pub destination: usize,
@@ -230,7 +232,7 @@ pub fn damage_creep(target: Entity, damage: u64, mut life: &mut Life, ew: &mut E
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Component, Copy)]
 pub enum Type {
     Ground,
     Flying,

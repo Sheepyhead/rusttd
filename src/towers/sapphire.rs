@@ -13,12 +13,12 @@ use bevy::prelude::{self, *};
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
-    fn build(&self, app: &mut prelude::AppBuilder) {
+    fn build(&self, app: &mut prelude::App) {
         app.add_system_set(
             SystemSet::on_update(LevelState::Spawning)
-                .with_system(attack.system())
-                .with_system(Slowed::added.system())
-                .with_system(Slowed::system.system()),
+                .with_system(attack)
+                .with_system(Slowed::added)
+                .with_system(Slowed::system),
         );
     }
 }
@@ -116,6 +116,7 @@ pub fn tower(quality: GemQuality) -> TowerBundle {
     }
 }
 
+#[derive(Component)]
 pub struct Slowed(pub u32, pub Timer);
 
 impl Slowed {

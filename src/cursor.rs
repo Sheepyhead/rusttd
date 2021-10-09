@@ -11,23 +11,21 @@ use kurinji::OnActionBegin;
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
-    fn build(&self, app: &mut prelude::AppBuilder) {
+    fn build(&self, app: &mut prelude::App) {
         app.insert_resource(ShowGrid(true))
-            .add_system_set(
-                SystemSet::on_enter(LevelState::Building).with_system(activate_cursor.system()),
-            )
+            .add_system_set(SystemSet::on_enter(LevelState::Building).with_system(activate_cursor))
             .add_system_set(
                 SystemSet::on_update(LevelState::Building)
-                    .with_system(render_grid.system())
-                    .with_system(build_on_click.system()),
+                    .with_system(render_grid)
+                    .with_system(build_on_click),
             )
             .add_system_set(
                 SystemSet::on_exit(LevelState::Building)
-                    .with_system(deactivate_cursor.system().label("deactivate"))
-                    .with_system(render_grid.system().after("deactivate")),
+                    .with_system(deactivate_cursor.label("deactivate"))
+                    .with_system(render_grid.after("deactivate")),
             )
             .add_system_set(
-                SystemSet::on_update(LevelState::Choosing).with_system(choose_on_click.system()),
+                SystemSet::on_update(LevelState::Choosing).with_system(choose_on_click),
             );
     }
 }
@@ -35,7 +33,9 @@ impl prelude::Plugin for Plugin {
 #[derive(Default)]
 pub struct ShowGrid(bool);
 
+#[derive(Component)]
 pub struct Grid;
+
 fn activate_cursor(mut show: ResMut<ShowGrid>) {
     show.0 = true;
 }
@@ -55,9 +55,7 @@ fn render_grid(
     ground: Query<(), With<Ground>>,
 ) {
     if show.0 {
-        let camera = cameras
-            .single()
-            .expect("Missing or multiple picking cameras");
+        let camera = cameras.single();
 
         let (picked_entity, intersection) = if let Some(val) = camera.intersect_top() {
             val
@@ -86,7 +84,7 @@ fn render_grid(
             },
         );
 
-        if let Ok((_, mut transform, mut mat)) = cursors.single_mut() {
+        if let Ok((_, mut transform, mut mat)) = cursors.get_single_mut() {
             if transform.translation != grid_pos {
                 transform.translation = grid_pos;
             }
@@ -128,9 +126,7 @@ fn build_on_click(
             continue;
         }
 
-        let camera = cameras
-            .single()
-            .expect("Missing or multiple picking cameras");
+        let camera = cameras.single();
 
         let (picked_entity, intersection) = if let Some(val) = camera.intersect_top() {
             val
@@ -158,9 +154,7 @@ fn choose_on_click(
         if action.action != "LEFT_CLICK" {
             continue;
         }
-        let camera = cameras
-            .single()
-            .expect("Missing or multiple picking cameras");
+        let camera = cameras.single();
 
         let (picked_entity, intersection) = if let Some(val) = camera.intersect_top() {
             val

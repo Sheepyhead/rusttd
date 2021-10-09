@@ -15,8 +15,8 @@ use bevy::prelude::{self, *};
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
-    fn build(&self, app: &mut prelude::AppBuilder) {
-        app.add_system_set(SystemSet::on_update(LevelState::Spawning).with_system(attack.system()));
+    fn build(&self, app: &mut prelude::App) {
+        app.add_system_set(SystemSet::on_update(LevelState::Spawning).with_system(attack));
     }
 }
 

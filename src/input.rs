@@ -6,8 +6,8 @@ use std::fs::read_to_string;
 pub struct Plugin;
 
 impl bevy::prelude::Plugin for Plugin {
-    fn build(&self, app: &mut bevy::prelude::AppBuilder) {
-        app.add_system_set(SystemSet::on_enter(GameState::Play).with_system(setup.system()));
+    fn build(&self, app: &mut bevy::prelude::App) {
+        app.add_system_set(SystemSet::on_enter(GameState::Play).with_system(setup));
     }
 }
 

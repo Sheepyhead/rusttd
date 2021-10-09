@@ -11,14 +11,15 @@ pub mod on_hit;
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
-    fn build(&self, app: &mut prelude::AppBuilder) {
-        app.add_system(splash.system())
-            .add_system(aura::Auras::apply_aura_to_new_tower.system())
-            .add_system(aura::Auras::apply_new_aura.system());
+    fn build(&self, app: &mut App) {
+        app.add_system(splash)
+            .add_system(aura::Auras::apply_aura_to_new_tower)
+            .add_system(aura::Auras::apply_new_aura);
     }
 }
 
 #[allow(clippy::module_name_repetitions)]
+#[derive(Component)]
 pub struct OnHitAbilities(pub Vec<OnHit>);
 
 #[allow(

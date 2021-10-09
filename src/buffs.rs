@@ -4,12 +4,12 @@ use bevy::prelude::{self, *};
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_system(AttackSpeed::apply.system());
+    fn build(&self, app: &mut App) {
+        app.add_system(AttackSpeed::apply);
     }
 }
 
-#[derive(PartialEq, PartialOrd)]
+#[derive(Component, PartialEq, PartialOrd)]
 pub struct AttackSpeed(pub f32);
 
 impl AttackSpeed {

@@ -7,7 +7,7 @@ use bevy::{
 pub struct Plugin;
 
 impl prelude::Plugin for Plugin {
-    fn build(&self, app: &mut prelude::AppBuilder) {
+    fn build(&self, app: &mut prelude::App) {
         app.insert_resource(Grid::default());
     }
 }

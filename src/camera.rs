@@ -7,12 +7,13 @@ use crate::level_1::assets::GameState;
 pub struct Plugin;
 
 impl bevy::prelude::Plugin for Plugin {
-    fn build(&self, app: &mut bevy::prelude::AppBuilder) {
-        app.add_startup_system(setup.system())
-            .add_system_set(SystemSet::on_update(GameState::Play).with_system(control.system()));
+    fn build(&self, app: &mut bevy::prelude::App) {
+        app.add_startup_system(setup)
+            .add_system_set(SystemSet::on_update(GameState::Play).with_system(control));
     }
 }
 
+#[derive(Component)]
 struct MainCamera;
 
 fn setup(mut commands: Commands) {
@@ -33,7 +34,7 @@ fn control(
     mut er: EventReader<OnActionActive>,
     mut camera: Query<&mut Transform, With<MainCamera>>,
 ) {
-    let mut camera = camera.single_mut().expect("None or multiple main cameras!");
+    let mut camera = camera.single_mut();
     let velocity = time.delta_seconds() * 10.0;
     for action in er.iter() {
         match action.action.as_str() {
