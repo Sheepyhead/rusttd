@@ -108,7 +108,7 @@ pub struct Gem {
 }
 
 impl Gem {
-    fn shape(&self) -> shape::Cube {
+    fn _shape(&self) -> shape::Cube {
         shape::Cube {
             size: match self.quality {
                 GemQuality::Chipped => 0.4,
@@ -145,9 +145,8 @@ pub struct BuildGem {
 fn build_gem(
     mut commands: Commands,
     mut er: EventReader<BuildGem>,
+    ass: ResMut<AssetServer>,
     mut grid: ResMut<Grid>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut mats: ResMut<Assets<StandardMaterial>>,
 ) {
     for BuildGem { pos } in er.iter() {
         let positions = [
@@ -161,10 +160,12 @@ fn build_gem(
             continue;
         }
 
+        let mesh: Handle<Mesh> = ass.load("hole.gltf#Mesh0/Primitive0");
+        let material: Handle<StandardMaterial> = ass.load("hole.gltf#Material0");
         let entity = commands
             .spawn_bundle(PbrBundle {
-                mesh: meshes.add(shape::Cube::new(2.0).into()),
-                material: mats.add(Color::BEIGE.into()),
+                mesh,
+                material,
                 transform: Transform::from_translation(Vec3::new(pos.0 as f32, 0.5, pos.1 as f32)),
                 ..PbrBundle::default()
             })
@@ -182,20 +183,19 @@ pub struct ChooseGem {
 
 fn reveal_gems(
     mut commands: Commands,
-    mut mats: ResMut<Assets<StandardMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut gems: Query<(Entity, &mut Handle<StandardMaterial>, &mut Handle<Mesh>), With<JustBuilt>>,
+    ass: ResMut<AssetServer>,
+    mut gems: Query<Entity, With<JustBuilt>>,
 ) {
-    for (entity, mut material, mut mesh) in gems.iter_mut() {
+    for entity in gems.iter_mut() {
         let r#type: GemType = rand::random();
         let quality: GemQuality = rand::random();
         let gem = Gem { quality, r#type };
-        *material = mats.add(r#type.color().into());
-        *mesh = meshes.add(gem.shape().into());
+        let mesh: Handle<Mesh> = ass.load("clearcube.gltf#Mesh0/Primitive0");
+        let material: Handle<StandardMaterial> = ass.load("clearcube.gltf#Material0");
         commands
             .entity(entity)
             .insert_bundle(gem.tower())
-            .insert_bundle((gem, Tower));
+            .insert_bundle((gem, Tower, mesh, material));
     }
 }
 
@@ -206,9 +206,8 @@ fn choose_gem(
     mut commands: Commands,
     mut er: EventReader<ChooseGem>,
     grid: ResMut<Grid>,
-    mut mats: ResMut<Assets<StandardMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut gems: Query<(Entity, &mut Handle<StandardMaterial>, &mut Handle<Mesh>), With<JustBuilt>>,
+    ass: ResMut<AssetServer>,
+    mut gems: Query<Entity, With<JustBuilt>>,
 ) {
     for ChooseGem { pos } in er.iter() {
         if let Some(chosen_entity) = grid.get(*pos) {
@@ -216,16 +215,16 @@ fn choose_gem(
                 continue;
             }
 
-            for (entity, mut material, mut mesh) in gems.iter_mut() {
+            for entity in gems.iter_mut() {
                 if entity != chosen_entity {
-                    *material = mats.add(Color::DARK_GRAY.into());
-                    *mesh = meshes.add(shape::Cube { size: 2.0 }.into());
+                    let mesh: Handle<Mesh> = ass.load("ps1wall.gltf#Mesh0/Primitive0");
+                    let mat: Handle<StandardMaterial> = ass.load("ps1wall.gltf#Material0");
                     commands
                         .entity(entity)
                         .remove::<Gem>()
                         .remove_bundle::<TowerBundle>()
                         .remove::<Tower>()
-                        .insert(Rock);
+                        .insert_bundle((Rock, mesh, mat));
                 }
                 commands.entity(entity).remove::<JustBuilt>();
             }

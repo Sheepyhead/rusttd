@@ -32,6 +32,7 @@ fn main() {
 
     AssetLoader::new(GameState::Loading, GameState::Play)
         .with_collection::<assets::Fonts>()
+        .with_collection::<assets::Models>()
         .build(&mut app);
 
     app.insert_resource(Msaa { samples: 4 })
